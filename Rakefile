@@ -17,11 +17,20 @@ Jeweler::Tasks.new do |gem|
   gem.name = "shellforce"
   gem.homepage = "http://github.com/mille-printemps/shellforce"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
-  gem.email = "chiharu.kawatake@gmail.com"
+  gem.summary = %Q{Simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
+  gem.description = %Q{A simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
+  gem.email = ""
   gem.authors = ["Chiharu Kawatake"]
-  # dependencies defined in Gemfile
+  gem.files = FileList["[A-Z]*", "{bin,lib,spec}/**/*"]
+  gem.test_files = FileList["{spec}/**/*"]
+  gem.executables << 'shellforce'
+  gem.add_runtime_dependency("omniauth", "= 0.2.0")
+  gem.add_runtime_dependency("multi_json", "= 0.0.5")  
+  gem.add_runtime_dependency("mechanize", ">= 1.0.0")
+  gem.add_runtime_dependency("json", ">= 1.4.6")
+  gem.add_runtime_dependency("rack", ">= 1.2.3")
+  gem.add_runtime_dependency("sinatra", ">= 1.1.0")
+  gem.add_development_dependency("rspec")
 end
 Jeweler::RubygemsDotOrgTasks.new
 
