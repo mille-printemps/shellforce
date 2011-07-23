@@ -38,7 +38,7 @@ module ShellForce
       end
 
       @agent.authenticate
-      version = @agent.get("/services/data").collect {|v| v["url"]}.sort[-1]
+      version = JSON.parse(@agent.get("/services/data")).collect {|v| v["url"]}.sort[-1]
       @version_url = version
     end
 
@@ -54,15 +54,19 @@ module ShellForce
       @pid
     end
 
+    def version
+      @version_url
+    end
+
     def shutdown
       Process.kill("SIGTERM", @pid)
       pid, status = Process.wait2
       puts "Process #{pid} terminated."
     end
-    
-    def get(resource)
-      Rest.request(@version_url + resource) do |r|
-        @agent.get(r)
+
+    def get(resource, type=:json)
+      Rest.request(@version_url + resource, type) do |r, t|
+        @agent.get(r, t)
       end
     end
 
@@ -70,36 +74,36 @@ module ShellForce
     # post '/sobjects/account', '{"name" : "test"}'
     # post '/chatter/feeds/news/me/feed-items', {"text" => "test"}
     # Note that the first data is String and the second one is hash    
-    def post(resource, data)
-      Rest.request(@version_url + resource, data) do |r, d|
-        @agent.post(r, d)
+    def post(resource, data, type=:json)
+      Rest.request(@version_url + resource, data, type) do |r, d, t|
+        @agent.post(r, d, t)
       end
     end
 
-    def delete(resource)
-      Rest.request(@version_url + resource) do |r|
-        @agent.delete(r)
+    def delete(resource, type=:json)
+      Rest.request(@version_url + resource, type) do |r, t|
+        @agent.delete(r, t)
       end
     end
 
-    def patch(resource, data)
-      Rest.request(@version_url + resource, data) do |r, d|
-        @agent.patch(r, d)
+    def patch(resource, data, type=:json)
+      Rest.request(@version_url + resource, data, type) do |r, d, t|
+        @agent.patch(r, d, t)
       end
     end
 
-    def query(query)
-      Rest.request(query) do |q|
-        @agent.query(@version_url, q)
+    def query(query, type=:json)
+      Rest.request(query, type) do |q, t|
+        @agent.query(@version_url, q, t)
       end
     end
 
-    def search(query)
-      Rest.request(query) do |q|
-        @agent.search(@version_url, q)
+    def search(query, type=:json)
+      Rest.request(query, type) do |q, t|
+        @agent.search(@version_url, q, t)
       end
     end
-
+    
   end
 end
 
