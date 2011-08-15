@@ -31,7 +31,7 @@ module ShellForce
 
     attr_accessor :home, :client_id, :client_secret, \
     :host, :port, :document_root, :private_key, :cert, :logger, \
-    :user_name, :password, :user_agent, :rack_config
+    :user_name, :password, :user_agent, :rack_config, :format
   end
 
   def self.home
@@ -63,4 +63,5 @@ ShellForce.configure :default do
   set :password => nil
   set :user_agent => 'Mac FireFox'
   set :rack_config => File.join(File.dirname(File.expand_path(__FILE__)), 'config.ru')
+  set :format => :json
 end

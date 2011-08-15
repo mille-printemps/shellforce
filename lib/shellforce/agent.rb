@@ -14,7 +14,7 @@ module Net
     class Patch < Net::HTTPRequest
       METHOD = 'PATCH'
       REQUEST_HAS_BODY = true
-      RESPONSE_HAS_BODY = false
+      RESPONSE_HAS_BODY = true
     end
   end
 end
@@ -54,29 +54,29 @@ module ShellForce
       @headers = {"Authorization" => "OAuth #{@token}"}
     end
 
-    def head(resource, data={}, type=:json)
+    def head(resource, data={}, format=ShellForce.config.format)
       @agent.head(@instance_url + resource, data,
-                  :headers => @headers.merge(format("Accept", type)))
+                  :headers => @headers.merge(set_format("Accept", format)))
       @agent.page.body
     end
 
-    def get(resource, type=:json)
+    def get(resource, format=ShellForce.config.format)
       @agent.get(:url => @instance_url + resource,
-                 :headers => @headers.merge(format("Accept", type)))
+                 :headers => @headers.merge(set_format("Accept", format)))
       @agent.page.body
     end
 
-    def post(resource, data, type=:json)
-      headers = @headers.merge(format("Accept", type))
-      headers.merge!(format("Content-Type", type))
+    def post(resource, data, format=ShellForce.config.format)
+      headers = @headers.merge(set_format("Accept", format))
+      headers.merge!(set_format("Content-Type", format))
       
       if data.is_a?(String)
         @agent.post(@instance_url + resource, data, headers)
       else
         query = if data.is_a?(Hash)
-                  data.collect {|k,v| "#{k}=#{url_escape(v)}"}
+                  data.collect {|k,v| "#{k}=#{escape_url(v)}"}
                 elsif data.is_a?(Array)
-                  data.collect {|v| "#{v[0]}=#{url_escape(v[1])}"}
+                  data.collect {|v| "#{v[0]}=#{escape_url(v[1])}"}
                 else
                   raise ArguementError.new('The query must be a hash or an array of an array.')
                 end
@@ -86,26 +86,26 @@ module ShellForce
       @agent.page.body
     end
     
-    def delete(resource, type=:json)
+    def delete(resource, format=ShellForce.config.format)
       @agent.delete(@instance_url + resource, {},
-                    :headers => @headers.merge(format("Accept", type)))
+                    :headers => @headers.merge(set_format("Accept", format)))
       @agent.page.body
     end
     
-    def patch(resource, data, type=:json)
-      headers = @headers.merge(format("Accept", type))
-      headers.merge!(format("Content-Type", type))
+    def patch(resource, data, format=ShellForce.config.format)
+      headers = @headers.merge(set_format("Accept", format))
+      headers.merge!(set_format("Content-Type", format))
       
       @agent.request_with_entity(:patch, @instance_url + resource, data, :headers => headers)
       @agent.page.body
     end
 
-    def query(resource, query, type=:json)
-      submit_query(resource + '/query', query, type)
+    def query(resource, query, format=ShellForce.config.format)
+      submit_query(resource + '/query', query, format)
     end
 
-    def search(resource, query, type=:json)
-      submit_query(resource + '/search', query, type)
+    def search(resource, query, format=ShellForce.config.format)
+      submit_query(resource + '/search', query, format)
     end
     
     attr_reader :host, :instance_url, :organization_id, :token, :headers
@@ -119,19 +119,18 @@ module ShellForce
       $1 == nil ? nil : @agent.get($1)
     end
 
-    def submit_query(resource, query, type)
+    def submit_query(resource, query, format)
       @agent.get(:url => @instance_url + resource, :params => {'q' => query},
-                 :headers => @headers.merge(format("Accept", type)))
+                 :headers => @headers.merge(set_format("Accept", format)))
       @agent.page.body
     end
 
-    def url_escape(text)    
+    def escape_url(text)    
       CGI.escape(Mechanize::Util.html_unescape(text))
     end
 
-    def format(header, type)
-      format = type.to_s
-      if (format != "json") && (format != "xml")
+    def set_format(header, format)
+      if (format.to_s != "json") && (format.to_s != "xml")
         raise ArgumentError.new("#{format} format is not accepted.")
       end
         

@@ -2,15 +2,16 @@
 
 require 'rubygems'
 require 'mechanize'
+require 'shellforce/config'
 
 module ShellForce
   class Rest
     def self.request(*args, &block)
       begin
-        from = Time.now
+        start = Time.now
         response = block.call(*args)
-        to = Time.now
-        return response, to-from
+        stop = Time.now
+        return response, stop-start
       rescue Mechanize::ResponseCodeError => rce
         raise rce.response_code + ' : ' + @@response_code_description[rce.response_code]
       rescue Mechanize::RedirectLimitReachedError        

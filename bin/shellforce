@@ -4,22 +4,32 @@
 $:.unshift File.dirname(__FILE__) + "/../lib"
 
 require 'rubygems'
-require 'json'
 require 'shellforce/client'
+require 'shellforce/command'
 
-VERBS = ['get', 'post', 'delete', 'patch', 'query', 'search']
+class Object
+  def local_methods
+    self.methods.sort - self.class.superclass.methods
+  end
+end
 
 def client
   @client ||= ShellForce::Client.new
 end
 
+def command
+  @command ||= ShellForce::Command.new
+end
+
 puts "Initialing..."
 client
+command
 
 config = ARGV.empty? ? :default : ARGV[0]
 ShellForce.config.use config
 
-VERBS.each do |m|
+CLIENT = client.local_methods
+CLIENT.each do |m|
     eval <<-METHOD
 def #{m}(*args, &block)
   begin
@@ -31,23 +41,19 @@ end
     METHOD
 end
 
-def instance_url
-  client.instance_url
+COMMAND = command.local_methods
+COMMAND.each do |m|
+    eval <<-METHOD
+def #{m}(*args, &block)
+  begin
+    command.#{m}(*args, &block)
+  rescue StandardError
+    puts $!
+  end
+end
+    METHOD
 end
 
-def token
-  client.token
-end
-
-def pid
-  client.pid
-end
-
-def pr(response)
-  puts JSON.pretty_generate(response[0])
-  puts "%s seconds" % response[1]
-end
- 
 require 'irb'
 require 'irb/completion'
 
@@ -59,7 +65,9 @@ ARGV.clear
 
 IRB.start
 
+=begin
 IRB.conf[:AT_EXIT] ||= []
-IRB.conf[:AT_EXIT] << Proc.new{client.shutdown}
+IRB.conf[:AT_EXIT] << Proc.new{shutdown}
+=end
 
 exit!

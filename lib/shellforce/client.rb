@@ -8,12 +8,12 @@ require 'shellforce/rest'
 
 # Override the default configuration with the local one
 begin
-  orgprofile = File.join(ShellForce.config.home, "orgprofile")
-  require orgprofile
+  local_config = File.join(ShellForce.config.home, "local_config")
+  require local_config
   FileUtils.chmod 0700, ShellForce.config.home
-  FileUtils.chmod 0600, orgprofile + '.rb'
+  FileUtils.chmod 0600, local_config + '.rb'
 rescue
-  puts 'No orgproifle.rb under ' + ShellForce.config.home + '. Make it and set necessary parameters. '
+  puts 'No local_config.rb under ' + ShellForce.config.home + '. Make it and set necessary parameters. '
   exit!
 end
 
@@ -38,8 +38,7 @@ module ShellForce
       end
 
       @agent.authenticate
-      version = JSON.parse(@agent.get("/services/data")).collect {|v| v["url"]}.sort[-1]
-      @version_url = version
+      @version = JSON.parse(@agent.get("/services/data")).collect {|v| v["url"]}.sort[-1]
     end
 
     def instance_url
@@ -50,23 +49,16 @@ module ShellForce
       @agent.token
     end
 
-    def pid
-      @pid
-    end
-
-    def version
-      @version_url
-    end
-
+    # SIGINT has to be used to kill WEBrick
     def shutdown
-      Process.kill("SIGTERM", @pid)
+      Process.kill("SIGINT", @pid)
       pid, status = Process.wait2
       puts "Process #{pid} terminated."
     end
 
-    def get(resource, type=:json)
-      Rest.request(@version_url + resource, type) do |r, t|
-        @agent.get(r, t)
+    def get(resource, format=ShellForce.config.format)
+      Rest.request(@version + resource, format) do |r, f|
+        @agent.get(r, f)
       end
     end
 
@@ -74,35 +66,37 @@ module ShellForce
     # post '/sobjects/account', '{"name" : "test"}'
     # post '/chatter/feeds/news/me/feed-items', {"text" => "test"}
     # Note that the first data is String and the second one is hash    
-    def post(resource, data, type=:json)
-      Rest.request(@version_url + resource, data, type) do |r, d, t|
-        @agent.post(r, d, t)
+    def post(resource, data, format=ShellForce.config.format)
+      Rest.request(@version + resource, data, format) do |r, d, f|
+        @agent.post(r, d, f)
       end
     end
 
-    def delete(resource, type=:json)
-      Rest.request(@version_url + resource, type) do |r, t|
-        @agent.delete(r, t)
+    def delete(resource, format=ShellForce.config.format)
+      Rest.request(@version + resource, format) do |r, f|
+        @agent.delete(r, f)
       end
     end
 
-    def patch(resource, data, type=:json)
-      Rest.request(@version_url + resource, data, type) do |r, d, t|
-        @agent.patch(r, d, t)
+    def patch(resource, data, format=ShellForce.config.format)
+      Rest.request(@version + resource, data, format) do |r, d, f|
+        @agent.patch(r, d, f)
       end
     end
 
-    def query(query, type=:json)
-      Rest.request(query, type) do |q, t|
-        @agent.query(@version_url, q, t)
+    def query(query, format=ShellForce.config.format)
+      Rest.request(query, format) do |q, f|
+        @agent.query(@version, q, f)
       end
     end
 
-    def search(query, type=:json)
-      Rest.request(query, type) do |q, t|
-        @agent.search(@version_url, q, t)
+    def search(query, format=ShellForce.config.format)
+      Rest.request(query, format) do |q, f|
+        @agent.search(@version, q, f)
       end
     end
+
+    attr_reader :pid, :version
     
   end
 end
