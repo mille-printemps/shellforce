@@ -19,13 +19,19 @@ module Net
   end
 end
 
-
 module ShellForce
   class Agent
     def initialize
       @host = [ShellForce.config.host, ShellForce.config.port].join(':')
       @agent = Mechanize.new
       @agent.user_agent_alias = ShellForce.config.user_agent
+
+      if ShellForce.config.logging
+        require 'logger'
+        Mechanize.log = Logger.new(File.join(ShellForce.home, 'log.txt'))
+        Mechanize.log.level = Logger::DEBUG
+      end
+      
     end
 
     def ping
@@ -48,10 +54,35 @@ module ShellForce
       end
       
       attributes = JSON.parse(@agent.page.root.search('p').children.text)
-      
+
       @instance_url = attributes['instance_url']
+      @issued_at = attributes['issued_at']
+      @refresh_token = attributes['refresh_token']
+      @signature = attributes['signature']
       @organization_id, @token = attributes['credentials']['token'].split("!")
       @headers = {"Authorization" => "OAuth #{@token}"}
+    end
+
+    def refresh
+      query = {
+        'grant_type' => 'refresh_token',
+        'client_id' => ShellForce.config.client_id,
+        'client_secret' => ShellForce.config.client_secret,
+        'refresh_token' => @refresh_token
+      }
+      
+      @agent.post(ShellForce.config.site + '/services/oauth2/token',
+                  query,
+                  set_format("Accept", :json))
+      
+      attributes = JSON.parse(@agent.page.body)
+      
+      @issued_at = attributes['issued_at']
+      @signature = attributes['signature']
+      @organization_id, @token = attributes['access_token'].split("!")
+      @headers = {"Authorization" => "OAuth #{@token}"}
+      
+      @token
     end
 
     def head(resource, data={}, format=ShellForce.config.format)
@@ -108,7 +139,7 @@ module ShellForce
       submit_query(resource + '/search', query, format)
     end
     
-    attr_reader :host, :instance_url, :organization_id, :token, :headers
+    attr_reader :host, :instance_url, :issued_at, :organization_id, :token, :headers
     
     private
 

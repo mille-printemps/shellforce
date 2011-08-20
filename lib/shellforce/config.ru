@@ -19,7 +19,8 @@ configuration = {
 :SSLPrivateKey => OpenSSL::PKey::RSA.new(File.open(ShellForce.config.private_key).read),
 :SSLCertificate => OpenSSL::X509::Certificate.new(File.open(ShellForce.config.cert).read),
 :SSLCertName => [["CN", WEBrick::Utils::getservername]],
-:Logger => ShellForce.config.logger
+:Logger => ShellForce.config.server_logger,
+:AccessLog => ShellForce.config.server_access_logger
 }
 
 application = Rack::Session::Cookie.new(

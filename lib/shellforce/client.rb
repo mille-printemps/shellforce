@@ -17,6 +17,7 @@ rescue
   exit!
 end
 
+
 $KCODE="UTF8"
 
 module ShellForce
@@ -49,16 +50,26 @@ module ShellForce
       @agent.token
     end
 
-    # SIGINT has to be used to kill WEBrick
-    def shutdown
-      Process.kill("SIGINT", @pid)
-      pid, status = Process.wait2
-      puts "Process #{pid} terminated."
+    def refresh
+      @agent.refresh
     end
 
-    def get(resource, format=ShellForce.config.format)
-      Rest.request(@version + resource, format) do |r, f|
-        @agent.get(r, f)
+    def shutdown
+      begin
+        n = Process.kill("SIGKILL", @pid)
+        if n == 1
+          puts "Process #{pid} terminated."
+        else
+          puts "Process #{pid} NOT terminated."
+        end
+      rescue AugmentError
+        raise $!
+      end
+    end
+
+    def get(resource)
+      Rest.request(@version + resource) do |r|
+        @agent.get(r, ShellForce.config.format)
       end
     end
 
@@ -66,33 +77,33 @@ module ShellForce
     # post '/sobjects/account', '{"name" : "test"}'
     # post '/chatter/feeds/news/me/feed-items', {"text" => "test"}
     # Note that the first data is String and the second one is hash    
-    def post(resource, data, format=ShellForce.config.format)
-      Rest.request(@version + resource, data, format) do |r, d, f|
-        @agent.post(r, d, f)
+    def post(resource, data)
+      Rest.request(@version + resource, data) do |r, d|
+        @agent.post(r, d, ShellForce.config.format)
       end
     end
 
-    def delete(resource, format=ShellForce.config.format)
-      Rest.request(@version + resource, format) do |r, f|
-        @agent.delete(r, f)
+    def delete(resource)
+      Rest.request(@version + resource) do |r|
+        @agent.delete(r, ShellForce.config.format)
       end
     end
 
-    def patch(resource, data, format=ShellForce.config.format)
-      Rest.request(@version + resource, data, format) do |r, d, f|
-        @agent.patch(r, d, f)
+    def patch(resource, data)
+      Rest.request(@version + resource, data) do |r, d|
+        @agent.patch(r, d, ShellForce.config.format)
       end
     end
 
-    def query(query, format=ShellForce.config.format)
-      Rest.request(query, format) do |q, f|
-        @agent.query(@version, q, f)
+    def query(query)
+      Rest.request(query) do |q|
+        @agent.query(@version, q, ShellForce.config.format)
       end
     end
 
-    def search(query, format=ShellForce.config.format)
-      Rest.request(query, format) do |q, f|
-        @agent.search(@version, q, f)
+    def search(query)
+      Rest.request(query, format) do |q|
+        @agent.search(@version, q, ShellForce.config.format)
       end
     end
 

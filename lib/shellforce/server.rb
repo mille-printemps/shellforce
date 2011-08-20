@@ -4,9 +4,6 @@ require 'rubygems'
 require 'rack'
 require 'shellforce/config'
 
-# TODO: exception handling
-#begin; require File.join(ShellForce.config.home, "orgprofile"); rescue ; end
-
 module ShellForce
   class Server < Rack::Server
     def initialize(config = ShellForce.config.rack_config)

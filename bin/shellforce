@@ -21,7 +21,7 @@ def command
   @command ||= ShellForce::Command.new
 end
 
-puts "Initialing..."
+puts "Initializing..."
 client
 command
 

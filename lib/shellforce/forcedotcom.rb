@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+require 'rubygems'
 require 'omniauth/oauth'
 require 'multi_json'
+require 'shellforce/config'
 
 module OmniAuth
   module Strategies
@@ -9,7 +11,7 @@ module OmniAuth
 
       def initialize(app, client_id = nil, client_secret = nil, options = {}, &block)
         client_options = {
-          :site => "https://login.salesforce.com",
+          :site => "#{ShellForce.config.site}",
           :authorize_path => "/services/oauth2/authorize",
           :access_token_path => "/services/oauth2/token"
         }
@@ -20,7 +22,14 @@ module OmniAuth
       end
       
       def auth_hash
-        OmniAuth::Utils.deep_merge(super, {'instance_url' => @access_token['instance_url']})
+        OmniAuth::Utils.deep_merge(super,
+                                   {
+                                     'instance_url' => @access_token['instance_url'],
+                                     'issued_at' => @access_token['issued_at'],
+                                     'refresh_token' => @access_token['refresh_token'],
+                                     'signature' => @access_token['signature']
+                                   }
+                                   )
       end
     end
   end

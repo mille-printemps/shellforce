@@ -29,9 +29,10 @@ module ShellForce
       Configuration.instance[name].each_pair {|k ,v| self.send("#{k}=", v)}
     end
 
-    attr_accessor :home, :client_id, :client_secret, \
-    :host, :port, :document_root, :private_key, :cert, :logger, \
-    :user_name, :password, :user_agent, :rack_config, :format
+    attr_accessor :port, :document_root, :private_key, :cert, \
+    :server_logger, :server_access_logger, \
+    :home, :site, :client_id, :client_secret, :host, \
+    :user_name, :password, :user_agent, :rack_config, :format, :logging
   end
 
   def self.home
@@ -48,20 +49,24 @@ module ShellForce
 end
 
 
-
 ShellForce.configure :default do
-  set :home => ShellForce.home
-  set :client_id => nil
-  set :client_secret => nil
-  set :host => 'https://localhost'
+  # WEBrick configuration
   set :port => '3000'
   set :document_root => ShellForce.home
   set :private_key => File.join(ShellForce.home, 'server.key')
   set :cert => File.join(ShellForce.home, 'server.crt')
-  set :logger => WEBrick::Log::new($stderr, WEBrick::Log::INFO)  
+  set :server_logger => WEBrick::Log::new($stderr, WEBrick::Log::FATAL)
+  set :server_access_logger => []  
+  # ShellForce configuration
+  set :home => ShellForce.home
+  set :site => 'https://login.salesforce.com'
+  set :client_id => nil
+  set :client_secret => nil
+  set :host => 'https://localhost'
   set :user_name => nil
   set :password => nil
   set :user_agent => 'Mac FireFox'
   set :rack_config => File.join(File.dirname(File.expand_path(__FILE__)), 'config.ru')
   set :format => :json
+  set :logging => false
 end
