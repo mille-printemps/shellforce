@@ -27,7 +27,7 @@ module ShellForce
     @@response_code_description = {
       '300' => 'The value used for an external ID exists in more than one record. The response boby contains the list of matching records.',
 
-      '400' => 'The requese could not be understood, usually because the JSON or XML body has an error. ',
+      '400' => 'The request could not be understood, usually because the JSON or XML body has an error. ',
 
       '401' => 'The session ID or OAuth token used has expired or is invalid. The response body contains the message and errorCode. ',
 

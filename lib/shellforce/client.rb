@@ -50,6 +50,10 @@ module ShellForce
       @agent.token
     end
 
+    def issued_at
+      @agent.issued_at
+    end
+
     def refresh
       @agent.refresh
     end

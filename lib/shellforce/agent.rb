@@ -52,15 +52,17 @@ module ShellForce
         redirect
         redirect
       end
-      
-      attributes = JSON.parse(@agent.page.root.search('p').children.text)
 
+      attributes = JSON.parse(@agent.page.root.search('p').children.text)
+      # TODO : conversion of "issued_at"
       @instance_url = attributes['instance_url']
       @issued_at = attributes['issued_at']
       @refresh_token = attributes['refresh_token']
       @signature = attributes['signature']
       @organization_id, @token = attributes['credentials']['token'].split("!")
       @headers = {"Authorization" => "OAuth #{@token}"}
+
+      @token
     end
 
     def refresh
@@ -143,7 +145,7 @@ module ShellForce
     
     private
 
-    # Salesforce does redirects by JavaScript.
+    # Salesforce redirects from one URL to another URL using JavaScript.
     # I admit that the following code is hacky.
     def redirect
       @agent.page.root.search('script').children.find{|c| c.text =~ /var url = '(.+)'/}
@@ -164,7 +166,7 @@ module ShellForce
       if (format.to_s != "json") && (format.to_s != "xml")
         raise ArgumentError.new("#{format} format is not accepted.")
       end
-        
+
       {header => "application/#{format}"}
     end
     

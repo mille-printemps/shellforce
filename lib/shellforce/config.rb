@@ -51,7 +51,7 @@ end
 
 ShellForce.configure :default do
   # WEBrick configuration
-  set :port => '3000'
+  set :port => 3000
   set :document_root => ShellForce.home
   set :private_key => File.join(ShellForce.home, 'server.key')
   set :cert => File.join(ShellForce.home, 'server.crt')
