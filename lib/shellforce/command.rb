@@ -6,26 +6,24 @@ require 'nokogiri'
 require 'shellforce/config'
 
 module ShellForce
-  class Command
+  module Command
 
-    def initialize
-      @xsl = Nokogiri::XSLT(@@XSLT)
+    def xsl
+      @xsl ||= Nokogiri::XSLT(XSLT)
     end
     
     def pp(response)
       if ShellForce.config.format == :json
         puts JSON.pretty_generate(JSON.parse(response[0]))
       elsif ShellForce.config.format == :xml
-        puts @xsl.apply_to(Nokogiri(response[0])).to_s
+        puts xsl.apply_to(Nokogiri(response[0])).to_s
       else
         puts response[0]
       end
       puts "%s seconds" % response[1]      
     end
 
-    private
-
-    @@XSLT = <<-XSLT
+    XSLT = <<-XSLT
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="xml" encoding="UTF-8"/>
     <xsl:param name="indent-increment" select="'  '"/>

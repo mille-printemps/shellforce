@@ -7,6 +7,8 @@ require 'rubygems'
 require 'shellforce/client'
 require 'shellforce/command'
 
+include ShellForce::Command
+
 class Object
   def local_methods
     self.methods.sort - self.class.superclass.methods
@@ -17,13 +19,8 @@ def client
   @client ||= ShellForce::Client.new
 end
 
-def command
-  @command ||= ShellForce::Command.new
-end
-
 puts "Initializing..."
 client
-command
 
 config = ARGV.empty? ? :default : ARGV[0]
 ShellForce.config.use config
@@ -34,19 +31,6 @@ CLIENT.each do |m|
 def #{m}(*args, &block)
   begin
     client.#{m}(*args, &block)
-  rescue StandardError
-    puts $!
-  end
-end
-    METHOD
-end
-
-COMMAND = command.local_methods
-COMMAND.each do |m|
-    eval <<-METHOD
-def #{m}(*args, &block)
-  begin
-    command.#{m}(*args, &block)
   rescue StandardError
     puts $!
   end

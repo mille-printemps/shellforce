@@ -9,11 +9,10 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chiharu Kawatake"]
-  s.date = %q{2011-06-12}
-  s.default_executable = %q{shellforce}
+  s.date = %q{2011-08-20}
   s.description = %q{A simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
   s.email = %q{}
-  s.executables = ["shellforce"]
+  s.executables = ["shellforce", "shellforce"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -30,9 +29,11 @@ Gem::Specification.new do |s|
     "lib/shellforce/agent.rb",
     "lib/shellforce/auth.rb",
     "lib/shellforce/client.rb",
+    "lib/shellforce/command.rb",
     "lib/shellforce/config.rb",
     "lib/shellforce/config.ru",
     "lib/shellforce/forcedotcom.rb",
+    "lib/shellforce/rest.rb",
     "lib/shellforce/server.rb",
     "spec/shellforce_spec.rb",
     "spec/spec_helper.rb"
@@ -41,7 +42,7 @@ Gem::Specification.new do |s|
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.6.2}
-  s.summary = %q{A simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
+  s.summary = %q{Simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
   s.test_files = ["spec/shellforce_spec.rb", "spec/spec_helper.rb"]
 
   if s.respond_to? :specification_version then
@@ -58,6 +59,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<json>, [">= 1.4.6"])
       s.add_runtime_dependency(%q<rack>, [">= 1.2.3"])
       s.add_runtime_dependency(%q<sinatra>, [">= 1.1.0"])
+      s.add_development_dependency(%q<webmock>, [">= 1.7.4"])
       s.add_development_dependency(%q<rspec>, [">= 0"])
     else
       s.add_dependency(%q<rspec>, ["~> 2.3.0"])
@@ -70,6 +72,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<json>, [">= 1.4.6"])
       s.add_dependency(%q<rack>, [">= 1.2.3"])
       s.add_dependency(%q<sinatra>, [">= 1.1.0"])
+      s.add_dependency(%q<webmock>, [">= 1.7.4"])
       s.add_dependency(%q<rspec>, [">= 0"])
     end
   else
@@ -83,6 +86,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<json>, [">= 1.4.6"])
     s.add_dependency(%q<rack>, [">= 1.2.3"])
     s.add_dependency(%q<sinatra>, [">= 1.1.0"])
+    s.add_dependency(%q<webmock>, [">= 1.7.4"])
     s.add_dependency(%q<rspec>, [">= 0"])
   end
 end
