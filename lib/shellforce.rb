@@ -6,4 +6,5 @@ require 'shellforce/forcedotcom'
 require 'shellforce/server'
 require 'shellforce/agent'
 require 'shellforce/client'
+require 'shellforce/util'
 

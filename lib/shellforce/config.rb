@@ -53,8 +53,8 @@ ShellForce.configure :default do
   # WEBrick configuration
   set :port => 3000
   set :document_root => ShellForce.home
-  set :private_key => File.join(ShellForce.home, 'server.key')
-  set :cert => File.join(ShellForce.home, 'server.crt')
+  set :private_key => File.join(ShellForce.home, 'key.pem')
+  set :cert => File.join(ShellForce.home, 'cert.pem')
   set :server_logger => WEBrick::Log::new($stderr, WEBrick::Log::FATAL)
   set :server_access_logger => []  
   # ShellForce configuration

@@ -4,6 +4,8 @@ require 'rubygems'
 require 'json'
 require 'nokogiri'
 require 'shellforce/config'
+require 'shellforce/util'
+include ShellForce::Util
 
 module ShellForce
   module Command
@@ -14,13 +16,13 @@ module ShellForce
     
     def pp(response)
       if ShellForce.config.format == :json
-        puts JSON.pretty_generate(JSON.parse(response[0]))
+        display JSON.pretty_generate(JSON.parse(response[0]))
       elsif ShellForce.config.format == :xml
-        puts xsl.apply_to(Nokogiri(response[0])).to_s
+        display xsl.apply_to(Nokogiri(response[0])).to_s
       else
-        puts response[0]
+        display response[0]
       end
-      puts "%s seconds" % response[1]      
+      display "%s seconds" % response[1]      
     end
 
     XSLT = <<-XSLT

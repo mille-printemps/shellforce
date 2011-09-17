@@ -5,6 +5,8 @@ require 'shellforce/config'
 require 'shellforce/server'
 require 'shellforce/agent'
 require 'shellforce/rest'
+require 'shellforce/util'
+include ShellForce::Util
 
 # Override the default configuration with the local one
 begin
@@ -13,7 +15,7 @@ begin
   FileUtils.chmod 0700, ShellForce.config.home
   FileUtils.chmod 0600, local_config + '.rb'
 rescue
-  puts 'No local_config.rb under ' + ShellForce.config.home + '. Make it and set necessary parameters. '
+  display 'No local_config.rb under ' + ShellForce.config.home + '. Make it and set necessary parameters. '
   exit!
 end
 
@@ -24,12 +26,14 @@ module ShellForce
   class Client
     def initialize(config = ShellForce.config.rack_config)
       @agent = ShellForce::Agent.new
+      @server = ShellForce::Server.new(config)
 
       status = begin
                  @agent.ping.size
                rescue
                  fork do
-                   ShellForce::Server.new(config).start
+                   #ShellForce::Server.new(config).start
+                   @server.start
                  end
                end
 
@@ -62,9 +66,9 @@ module ShellForce
       begin
         n = Process.kill("SIGKILL", @pid)
         if n == 1
-          puts "Process #{pid} terminated."
+          display "Process #{pid} terminated."
         else
-          puts "Process #{pid} NOT terminated."
+          display "Process #{pid} NOT terminated."
         end
       rescue AugmentError
         raise $!
