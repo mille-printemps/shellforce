@@ -9,11 +9,13 @@ module ShellForce
     def initialize(config = ShellForce.config.rack_config)
       super(:include => File.dirname(config), :config => config)
     end
+
     
     def start
       super.start
     end
 
+    
     def stop
       if server.respond_to?(:shutdwon)
         server.shutdown

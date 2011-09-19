@@ -78,6 +78,7 @@ module ShellForce
       display("#{LOCAL_CONFIG} is created under #{ShellForce.config.home}")
     end
 
+    
     def create_local_config(home, config)
       
       if !File.exists?(home) || !File.directory?(home)
@@ -90,6 +91,7 @@ require 'shellforce/config'
 ShellForce.configure :default do
   set :client_id => ''
   set :client_secret => ''
+  set :pp => false
   set :logging => false 
 end
 CONFIG
@@ -102,6 +104,7 @@ CONFIG
       FileUtils.chmod 0700, home
       FileUtils.chmod 0600, local_config
     end
+
     
     def create_cert(subject_info, private_key, cert)
       key = OpenSSL::PKey::RSA.new(1024)
@@ -132,6 +135,7 @@ CONFIG
       FileUtils.chmod 0600, cert
     end
 
+    
     # The following two methods are cited from heroku gem
     def display(text, newline=true)
       if newline
@@ -142,6 +146,7 @@ CONFIG
       end
     end
 
+    
     def ask
       gets.strip
     end

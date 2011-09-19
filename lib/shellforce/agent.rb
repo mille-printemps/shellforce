@@ -19,12 +19,15 @@ module Net
   end
 end
 
+
 module ShellForce
   class Agent
     def initialize
       @host = [ShellForce.config.host, ShellForce.config.port].join(':')
       @agent = Mechanize.new
       @agent.user_agent_alias = ShellForce.config.user_agent
+
+      @@pretty_print = {'X-PrettyPrint' => '1'}
 
       if ShellForce.config.logging
         require 'logger'
@@ -34,10 +37,12 @@ module ShellForce
       
     end
 
+    
     def ping
       @agent.get(@host)
       JSON.parse(@agent.page.body)      
     end
+
     
     def authenticate
       @agent.get(@host + OmniAuth.config.path_prefix + '/forcedotcom')
@@ -65,6 +70,7 @@ module ShellForce
       @token
     end
 
+    
     def refresh
       query = {
         'grant_type' => 'refresh_token',
@@ -73,8 +79,7 @@ module ShellForce
         'refresh_token' => @refresh_token
       }
       
-      @agent.post(ShellForce.config.site + '/services/oauth2/token',
-                  query,
+      @agent.post(ShellForce.config.site + '/services/oauth2/token', query,
                   set_format("Accept", :json))
       
       attributes = JSON.parse(@agent.page.body)
@@ -87,20 +92,30 @@ module ShellForce
       @token
     end
 
+    
     def head(resource, data={}, format=ShellForce.config.format)
-      @agent.head(@instance_url + resource, data,
-                  :headers => @headers.merge(set_format("Accept", format)))
-      @agent.page.body
+      headers = @headers.merge(set_format("Accept", format))
+      headers.merge!(@@pretty_print) if ShellForce.config.pp == true
+      
+      @agent.head(@instance_url + resource, data, :headers => headers)
+      
+      return @agent.page.header, @agent.page.body
     end
 
+    
     def get(resource, format=ShellForce.config.format)
-      @agent.get(:url => @instance_url + resource,
-                 :headers => @headers.merge(set_format("Accept", format)))
-      @agent.page.body
+      headers = @headers.merge(set_format("Accept", format))
+      headers.merge!(@@pretty_print) if ShellForce.config.pp == true     
+      
+      @agent.get(:url => @instance_url + resource, :headers => headers)
+      
+      return @agent.page.header, @agent.page.body
     end
 
+    
     def post(resource, data, format=ShellForce.config.format)
       headers = @headers.merge(set_format("Accept", format))
+      headers.merge!(@@pretty_print) if ShellForce.config.pp == true
       headers.merge!(set_format("Content-Type", format))
       
       if data.is_a?(String)
@@ -116,32 +131,42 @@ module ShellForce
         @agent.post(@instance_url + resource + "?#{query.join('&')}", '', headers)
       end
 
-      @agent.page.body
+      return @agent.page.header, @agent.page.body
     end
+
     
     def delete(resource, format=ShellForce.config.format)
-      @agent.delete(@instance_url + resource, {},
-                    :headers => @headers.merge(set_format("Accept", format)))
-      @agent.page.body
+      headers = @headers.merge(set_format("Accept", format))
+      headers.merge!(@@pretty_print) if ShellForce.config.pp == true
+      
+      @agent.delete(@instance_url + resource, {}, :headers => headers)
+      
+      return @agent.page.header, @agent.page.body
     end
+
     
     def patch(resource, data, format=ShellForce.config.format)
       headers = @headers.merge(set_format("Accept", format))
+      headers.merge!(@@pretty_print) if ShellForce.config.pp == true
       headers.merge!(set_format("Content-Type", format))
       
       @agent.request_with_entity(:patch, @instance_url + resource, data, :headers => headers)
-      @agent.page.body
+      
+      return @agent.page.header, @agent.page.body
     end
 
+    
     def query(resource, query, format=ShellForce.config.format)
       submit_query(resource + '/query', query, format)
     end
 
+    
     def search(resource, query, format=ShellForce.config.format)
       submit_query(resource + '/search', query, format)
     end
     
     attr_reader :host, :instance_url, :issued_at, :organization_id, :token, :headers
+
     
     private
 
@@ -152,16 +177,23 @@ module ShellForce
       $1 == nil ? nil : @agent.get($1)
     end
 
+    
     def submit_query(resource, query, format)
+      headers = @headers.merge(set_format("Accept", format))
+      headers.merge!(@@pretty_print) if ShellForce.config.pp == true
+      
       @agent.get(:url => @instance_url + resource, :params => {'q' => query},
-                 :headers => @headers.merge(set_format("Accept", format)))
-      @agent.page.body
+                 :headers => headers)
+      
+      return @agent.page.header, @agent.page.body
     end
 
+    
     def escape_url(text)    
       CGI.escape(Mechanize::Util.html_unescape(text))
     end
 
+    
     def set_format(header, format)
       if (format.to_s != "json") && (format.to_s != "xml")
         raise ArgumentError.new("#{format} format is not accepted.")

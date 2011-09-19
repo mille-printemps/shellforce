@@ -32,7 +32,6 @@ module ShellForce
                  @agent.ping.size
                rescue
                  fork do
-                   #ShellForce::Server.new(config).start
                    @server.start
                  end
                end
@@ -43,25 +42,31 @@ module ShellForce
       end
 
       @agent.authenticate
-      @version = JSON.parse(@agent.get("/services/data")).collect {|v| v["url"]}.sort[-1]
+      header, body = @agent.get("/services/data")
+      @version = JSON.parse(body).collect {|v| v["url"]}.sort[-1]
     end
 
+    
     def instance_url
       @agent.instance_url
     end
+
     
     def token
       @agent.token
     end
 
+    
     def issued_at
       @agent.issued_at
     end
 
+    
     def refresh
       @agent.refresh
     end
 
+    
     def shutdown
       begin
         n = Process.kill("SIGKILL", @pid)
@@ -75,6 +80,7 @@ module ShellForce
       end
     end
 
+    
     def get(resource)
       Rest.request(@version + resource) do |r|
         @agent.get(r, ShellForce.config.format)
@@ -91,24 +97,28 @@ module ShellForce
       end
     end
 
+    
     def delete(resource)
       Rest.request(@version + resource) do |r|
         @agent.delete(r, ShellForce.config.format)
       end
     end
 
+    
     def patch(resource, data)
       Rest.request(@version + resource, data) do |r, d|
         @agent.patch(r, d, ShellForce.config.format)
       end
     end
 
+    
     def query(query)
       Rest.request(query) do |q|
         @agent.query(@version, q, ShellForce.config.format)
       end
     end
 
+    
     def search(query)
       Rest.request(query, format) do |q|
         @agent.search(@version, q, ShellForce.config.format)

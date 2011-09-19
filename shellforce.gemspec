@@ -9,10 +9,10 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chiharu Kawatake"]
-  s.date = %q{2011-08-20}
+  s.date = %q{2011-09-19}
   s.description = %q{A simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
   s.email = %q{}
-  s.executables = ["shellforce", "shellforce"]
+  s.executables = ["shellforce", "create_shellforce_config", "shellforce"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "bin/create_shellforce_config",
     "bin/shellforce",
     "lib/shellforce.rb",
     "lib/shellforce/agent.rb",
@@ -35,15 +36,22 @@ Gem::Specification.new do |s|
     "lib/shellforce/forcedotcom.rb",
     "lib/shellforce/rest.rb",
     "lib/shellforce/server.rb",
+    "lib/shellforce/util.rb",
+    "spec/agent_spec.rb",
+    "spec/agent_spec_helper.rb",
+    "spec/client_spec.rb",
+    "spec/config_spec.rb",
+    "spec/rest_spec.rb",
     "spec/shellforce_spec.rb",
-    "spec/spec_helper.rb"
+    "spec/spec_helper.rb",
+    "spec/util_spec.rb"
   ]
   s.homepage = %q{http://github.com/mille-printemps/shellforce}
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.6.2}
   s.summary = %q{Simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
-  s.test_files = ["spec/shellforce_spec.rb", "spec/spec_helper.rb"]
+  s.test_files = ["spec/agent_spec.rb", "spec/agent_spec_helper.rb", "spec/client_spec.rb", "spec/config_spec.rb", "spec/rest_spec.rb", "spec/shellforce_spec.rb", "spec/spec_helper.rb", "spec/util_spec.rb"]
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
@@ -60,7 +68,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<rack>, [">= 1.2.3"])
       s.add_runtime_dependency(%q<sinatra>, [">= 1.1.0"])
       s.add_development_dependency(%q<webmock>, [">= 1.7.4"])
-      s.add_development_dependency(%q<rspec>, [">= 0"])
+      s.add_development_dependency(%q<rspec>, [">= 2.6"])
     else
       s.add_dependency(%q<rspec>, ["~> 2.3.0"])
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
@@ -73,7 +81,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rack>, [">= 1.2.3"])
       s.add_dependency(%q<sinatra>, [">= 1.1.0"])
       s.add_dependency(%q<webmock>, [">= 1.7.4"])
-      s.add_dependency(%q<rspec>, [">= 0"])
+      s.add_dependency(%q<rspec>, [">= 2.6"])
     end
   else
     s.add_dependency(%q<rspec>, ["~> 2.3.0"])
@@ -87,7 +95,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<rack>, [">= 1.2.3"])
     s.add_dependency(%q<sinatra>, [">= 1.1.0"])
     s.add_dependency(%q<webmock>, [">= 1.7.4"])
-    s.add_dependency(%q<rspec>, [">= 0"])
+    s.add_dependency(%q<rspec>, [">= 2.6"])
   end
 end
 

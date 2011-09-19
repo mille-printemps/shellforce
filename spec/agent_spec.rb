@@ -15,6 +15,7 @@ describe ShellForce::Agent do
     response.should == body
   end
 
+  
   it "refreshes a token" do
     
     # Authenticate first to initialize the refresh token
@@ -43,88 +44,98 @@ BODY_SIX
     @agent.issued_at.should == @new_issued_at
     @agent.token.should == @new_token
     @agent.headers.should  == @new_headers
-
   end
 
+  
   it "gets" do
     authenticate
 
     body = '{"totalSize":0}'
-    headers = @headers.merge({"Accept" => "application/#{ShellForce.config.format}"})
+    headers = @headers.merge(@accept)
+    headers.merge!(@pretty_print) if ShellForce.config.pp == true
 
     stub_request(:get, @instance_url + @resource).
       with(:headers => headers).
       to_return(:body => body)
     
-    response = @agent.get(@resource)
-    response.should == body
+    response_header, response_body = @agent.get(@resource)
+    response_body.should == body
   end
 
+  
   it "posts a string" do
     authenticate
 
     body = '{"totalSize":0}'
-    headers = @headers.merge({"Accept" => "application/#{ShellForce.config.format}"})
-    headers.merge!({"Content-Type" => "application/#{ShellForce.config.format}"})
+    headers = @headers.merge(@accept)
+    headers.merge!(@pretty_print) if ShellForce.config.pp == true    
+    headers.merge!(@content_type)
     request = '{"name" => "name"}'
     
     stub_request(:post, @instance_url + @resource).
       with(:body => request, :headers => headers).
       to_return(:body => body)
 
-    response = @agent.post(@resource, request)
-    response.should == body
+    response_header, response_body = @agent.post(@resource, request)
+    response_body.should == body
   end
 
+  
   it "posts a hash or an array" do
     authenticate
 
     body = '{"totalSize":0}'
-    headers = @headers.merge({"Accept" => "application/#{ShellForce.config.format}"})
-    headers.merge!({"Content-Type" => "application/#{ShellForce.config.format}"})
+    headers = @headers.merge(@accept)
+    headers.merge!(@pretty_print) if ShellForce.config.pp == true    
+    headers.merge!(@content_type)
     query = {"a" => "b", "c" => "d"}
 
     stub_request(:post, @instance_url + @resource).
       with(:query => query, :headers => headers).
       to_return(:body => body)
 
-    response = @agent.post(@resource, query)
-    response.should == body
+    response_header, response_body = @agent.post(@resource, query)
+    response_body.should == body
 
-    response = @agent.post(@resource, [["a","b"],["c","d"]])
-    response.should == body
+    response_header, response_body = @agent.post(@resource, [["a","b"],["c","d"]])
+    response_body.should == body
   end
 
+  
   it "deletes" do
     authenticate
 
     body = ''
-    headers = @headers.merge({"Accept" => "application/#{ShellForce.config.format}"})
+    headers = @headers.merge(@accept)
+    headers.merge!(@pretty_print) if ShellForce.config.pp == true
     
     stub_request(:delete, @instance_url + @resource).
       with(:headers => headers).
       to_return(:body => body)
 
-    response = @agent.delete(@resource)
-    response.should == body
+    response_header, response_body = @agent.delete(@resource)
+    response_body.should == body
   end
 
+  
   it "patches" do
     authenticate
 
     body = '{"totalSize":0}'
-    headers = @headers.merge({"Accept" => "application/#{ShellForce.config.format}"})
-    headers.merge!({"Content-Type" => "application/#{ShellForce.config.format}"})
+    headers = @headers.merge(@accept)
+    headers.merge!(@pretty_print) if ShellForce.config.pp == true
+    headers.merge!(@content_type)
     request = '{"name" => "name"}'
 
     stub_request(:patch, @instance_url + @resource).
       with(:body => request, :headers => headers).
       to_return(:body => body)
 
-    response = @agent.patch(@resource, request)
-    response.should == body
+    response_header, response_body = @agent.patch(@resource, request)
+    response_body.should == body
   end
-    
+
+  
   it "queries" do
     authenticate
 
@@ -133,6 +144,7 @@ BODY_SIX
     end
   end
 
+  
   it "searches" do
     authenticate
 

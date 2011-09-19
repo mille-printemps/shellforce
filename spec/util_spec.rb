@@ -12,6 +12,7 @@ describe ShellForce::Util do
     @cert = File.join(ShellForce.home, 'test_cert.pem')
   end
 
+  
   it "creates local_config.rb on home directory" do
 
     create_local_config(ShellForce.home, @config)
@@ -30,11 +31,13 @@ describe ShellForce::Util do
 
     ShellForce.config.client_id.should == ''
     ShellForce.config.client_secret.should == ''
+    ShellForce.config.pp.should == false
     ShellForce.config.logging.should == false
 
     FileUtils.remove(@local_config) if File.exists?(@local_config)  
   end
 
+  
   it "creates key and cert files on home directory" do
 
     subject_info = {

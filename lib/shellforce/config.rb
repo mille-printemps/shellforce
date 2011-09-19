@@ -20,11 +20,13 @@ module ShellForce
       @config = {}
     end
 
+    
     def [](name)
       @config[name] ||= {} unless @config.has_key?(name)
       @config[name]
     end
 
+    
     def use(name)
       Configuration.instance[name].each_pair {|k ,v| self.send("#{k}=", v)}
     end
@@ -32,17 +34,20 @@ module ShellForce
     attr_accessor :port, :document_root, :private_key, :cert, \
     :server_logger, :server_access_logger, \
     :home, :site, :client_id, :client_secret, :host, \
-    :user_name, :password, :user_agent, :rack_config, :format, :logging
+    :user_name, :password, :user_agent, :rack_config, :format, :pp, :logging
   end
 
+  
   def self.home
     Configuration.instance.home
   end
+
   
   def self.configure(name, &block)
     Configuration.instance[name].instance_exec(&block)
   end
 
+  
   def self.config
     Configuration.instance
   end
@@ -68,5 +73,6 @@ ShellForce.configure :default do
   set :user_agent => 'Mac FireFox'
   set :rack_config => File.join(File.dirname(File.expand_path(__FILE__)), 'config.ru')
   set :format => :json
+  set :pp => false
   set :logging => false
 end

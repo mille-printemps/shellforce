@@ -9,6 +9,7 @@ describe ShellForce::Configuration do
     
   end
 
+  
   it "selects another configurarion" do
     
     client_id = 'client_id'
@@ -24,6 +25,7 @@ describe ShellForce::Configuration do
     ShellForce.config.client_id.should == client_id
     ShellForce.config.client_secret.should == client_secret
   end
+
   
   it "overrides parameters in a configuration" do
 

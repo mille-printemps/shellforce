@@ -4,7 +4,7 @@ require 'webmock/rspec'
 include WebMock::API
 
 shared_context "agent_shared_context" do
-  before {
+  before do
     ShellForce.config.port = 3000
     ShellForce.config.host = 'https://localhost'
     ShellForce.config.site = 'https://login.salesforce.com'
@@ -28,7 +28,12 @@ shared_context "agent_shared_context" do
     @new_headers = {"Authorization" => "OAuth #{@new_token}"}
 
     @resource = '/resource'
-  }
+
+    @accept = {"Accept" => "application/#{ShellForce.config.format}"}
+    @content_type = {"Content-Type" => "application/#{ShellForce.config.format}"}    
+    @pretty_print = {'X-PrettyPrint' => '1'}
+  end
+
   
   def authenticate
     body_one = <<-BODY_ONE
@@ -114,17 +119,19 @@ BODY_FIVE
     @agent.headers.should == @headers
   end
 
+  
   def submit_query(resource, &block)
     body = '{"totalSize":0}'
-    headers = @headers.merge({"Accept" => "application/#{ShellForce.config.format}"})
+    headers = @headers.merge(@accept)
+    headers.merge!(@pretty_print) if ShellForce.config.pp == true    
     query = {'q' => 'a'}
 
     stub_request(:get, @instance_url + @resource + resource).
       with(:query => query, :headers => headers).
       to_return(:body => body)
 
-    response = block.call(@resource, 'a')
-    response.should == body
+    response_header, response_body = block.call(@resource, 'a')
+    response_body.should == body
   end
   
 end
