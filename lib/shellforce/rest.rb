@@ -6,11 +6,13 @@ require 'shellforce/config'
 
 module ShellForce
   class Rest
-    def self.request(*args, &block)
+    def self.request(*args)
       begin
+        # TODO : plug-in
         start = Time.now
-        response_header, response_body = block.call(*args)
+        response_header, response_body = yield(*args)
         stop = Time.now
+        # TODO : plug-in
         return response_header, response_body, stop-start
       rescue Mechanize::ResponseCodeError => rce
         raise rce.response_code + ' : ' + @@response_code_description[rce.response_code]

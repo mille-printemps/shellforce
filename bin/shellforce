@@ -28,9 +28,9 @@ ShellForce.config.use config
 CLIENT = client.local_methods
 CLIENT.each do |m|
     eval <<-METHOD
-def #{m}(*args, &block)
+def #{m}(*args)
   begin
-    client.#{m}(*args, &block)
+    client.#{m}(*args)
   rescue StandardError
     puts $!
   end
