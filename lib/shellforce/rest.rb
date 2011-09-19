@@ -9,9 +9,9 @@ module ShellForce
     def self.request(*args, &block)
       begin
         start = Time.now
-        response_body = block.call(*args)
+        response_header, response_body = block.call(*args)
         stop = Time.now
-        return response_body, stop-start
+        return response_header, response_body, stop-start
       rescue Mechanize::ResponseCodeError => rce
         raise rce.response_code + ' : ' + @@response_code_description[rce.response_code]
       rescue Mechanize::RedirectLimitReachedError        

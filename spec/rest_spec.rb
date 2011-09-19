@@ -5,7 +5,7 @@ describe ShellForce::Rest do
   
   it "executes a block and returns its result and response time" do
 
-    method = lambda {|a,b,c| {}, a+b+c}
+    method = lambda {|a,b,c| return {}, a+b+c}
     
     result = ShellForce::Rest.request("a", "b", "c") do |a, b, c|
       method.call(a,b,c)
