@@ -7,4 +7,6 @@ require 'shellforce/server'
 require 'shellforce/agent'
 require 'shellforce/client'
 require 'shellforce/util'
+require 'shellforce/transport'
+require 'shellforce/exception'
 

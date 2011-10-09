@@ -3,17 +3,7 @@
 
 $:.unshift File.dirname(__FILE__) + "/../lib"
 
-require 'rubygems'
 require 'shellforce/client'
-require 'shellforce/command'
-
-include ShellForce::Command
-
-class Object
-  def local_methods
-    self.methods.sort - self.class.superclass.methods
-  end
-end
 
 def client
   @client ||= ShellForce::Client.new
@@ -25,7 +15,7 @@ client
 config = ARGV.empty? ? :default : ARGV[0]
 ShellForce.config.use config
 
-CLIENT = client.local_methods
+CLIENT = client.methods.sort - client.class.superclass.methods
 CLIENT.each do |m|
     eval <<-METHOD
 def #{m}(*args)

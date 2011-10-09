@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chiharu Kawatake"]
-  s.date = %q{2011-09-19}
+  s.date = %q{2011-10-09}
   s.description = %q{A simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
   s.email = %q{}
   s.executables = ["shellforce", "create_shellforce_config", "shellforce"]
@@ -33,9 +33,11 @@ Gem::Specification.new do |s|
     "lib/shellforce/command.rb",
     "lib/shellforce/config.rb",
     "lib/shellforce/config.ru",
+    "lib/shellforce/exception.rb",
     "lib/shellforce/forcedotcom.rb",
     "lib/shellforce/rest.rb",
     "lib/shellforce/server.rb",
+    "lib/shellforce/transport.rb",
     "lib/shellforce/util.rb",
     "spec/agent_spec.rb",
     "spec/agent_spec_helper.rb",
@@ -44,6 +46,7 @@ Gem::Specification.new do |s|
     "spec/rest_spec.rb",
     "spec/shellforce_spec.rb",
     "spec/spec_helper.rb",
+    "spec/transport_spec.rb",
     "spec/util_spec.rb"
   ]
   s.homepage = %q{http://github.com/mille-printemps/shellforce}
@@ -51,7 +54,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.6.2}
   s.summary = %q{Simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
-  s.test_files = ["spec/agent_spec.rb", "spec/agent_spec_helper.rb", "spec/client_spec.rb", "spec/config_spec.rb", "spec/rest_spec.rb", "spec/shellforce_spec.rb", "spec/spec_helper.rb", "spec/util_spec.rb"]
+  s.test_files = ["spec/agent_spec.rb", "spec/agent_spec_helper.rb", "spec/client_spec.rb", "spec/config_spec.rb", "spec/rest_spec.rb", "spec/shellforce_spec.rb", "spec/spec_helper.rb", "spec/transport_spec.rb", "spec/util_spec.rb"]
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
@@ -62,8 +65,6 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<jeweler>, ["~> 1.6.2"])
       s.add_development_dependency(%q<rcov>, [">= 0"])
       s.add_runtime_dependency(%q<omniauth>, ["= 0.2.0"])
-      s.add_runtime_dependency(%q<multi_json>, ["= 0.0.5"])
-      s.add_runtime_dependency(%q<mechanize>, [">= 1.0.0"])
       s.add_runtime_dependency(%q<json>, [">= 1.4.6"])
       s.add_runtime_dependency(%q<rack>, [">= 1.2.3"])
       s.add_runtime_dependency(%q<sinatra>, [">= 1.1.0"])
@@ -75,8 +76,6 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<jeweler>, ["~> 1.6.2"])
       s.add_dependency(%q<rcov>, [">= 0"])
       s.add_dependency(%q<omniauth>, ["= 0.2.0"])
-      s.add_dependency(%q<multi_json>, ["= 0.0.5"])
-      s.add_dependency(%q<mechanize>, [">= 1.0.0"])
       s.add_dependency(%q<json>, [">= 1.4.6"])
       s.add_dependency(%q<rack>, [">= 1.2.3"])
       s.add_dependency(%q<sinatra>, [">= 1.1.0"])
@@ -89,8 +88,6 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<jeweler>, ["~> 1.6.2"])
     s.add_dependency(%q<rcov>, [">= 0"])
     s.add_dependency(%q<omniauth>, ["= 0.2.0"])
-    s.add_dependency(%q<multi_json>, ["= 0.0.5"])
-    s.add_dependency(%q<mechanize>, [">= 1.0.0"])
     s.add_dependency(%q<json>, [">= 1.4.6"])
     s.add_dependency(%q<rack>, [">= 1.2.3"])
     s.add_dependency(%q<sinatra>, [">= 1.1.0"])

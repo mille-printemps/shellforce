@@ -1,18 +1,26 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe ShellForce::Rest do
   
   it "executes a block and returns its result and response time" do
 
-    method = lambda {|a,b,c| return {}, a+b+c}
+    # A dummy response
+    response = []
+    class << response
+      def body
+        "abc"
+      end
+    end
+    
+    method = lambda {|a,b,c| return response}
     
     result = ShellForce::Rest.request("a", "b", "c") do |a, b, c|
       method.call(a,b,c)
     end
 
-    result[1].should == "abc"
-    result[2].zero?.should == false
+    result[0].should == "abc"
+    result[1].zero?.should == false
   end
 
   

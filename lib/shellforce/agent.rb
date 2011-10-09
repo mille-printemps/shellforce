@@ -1,70 +1,46 @@
 # coding: utf-8
 
 require 'rubygems'
-require 'net/http'
-require 'mechanize'
 require 'json'
-require 'omniauth'
+require 'shellforce/transport'
 require 'shellforce/config'
-
-
-# Monkey patch for 'PATCH' method
-module Net
-  class HTTP
-    class Patch < Net::HTTPRequest
-      METHOD = 'PATCH'
-      REQUEST_HAS_BODY = true
-      RESPONSE_HAS_BODY = true
-    end
-  end
-end
-
+require 'shellforce/exception'
 
 module ShellForce
   class Agent
     def initialize
-      @host = [ShellForce.config.host, ShellForce.config.port].join(':')
-      @agent = Mechanize.new
-      @agent.user_agent_alias = ShellForce.config.user_agent
-
-      @@pretty_print = {'X-PrettyPrint' => '1'}
+      @transport = ShellForce::Transport.new
 
       if ShellForce.config.logging
         require 'logger'
-        Mechanize.log = Logger.new(File.join(ShellForce.home, 'log.txt'))
-        Mechanize.log.level = Logger::DEBUG
+        @transport.log = Logger.new(File.join(ShellForce.home, 'log.txt'))
+        @transport.log.level = Logger::DEBUG
       end
-      
-    end
-
-    
-    def ping
-      @agent.get(@host)
-      JSON.parse(@agent.page.body)      
     end
 
     
     def authenticate
-      @agent.get(@host + OmniAuth.config.path_prefix + '/forcedotcom')
+      # username and password flow
+      query = {
+        'grant_type' => 'password',
+        'client_id' => ShellForce.config.client_id,
+        'client_secret' => ShellForce.config.client_secret,
+        'username' => ShellForce.config.user_name,
+        'password' => ShellForce.config.password
+      }
 
-      login_form = redirect.form_with('login')
-      if login_form != nil
-        login_form.username = ShellForce.config.user_name
-        login_form.pw = ShellForce.config.password
-        login_form.un = ShellForce.config.user_name
-        login_form.submit
-
-        redirect
-        redirect
+      response = request do
+        @transport.post(ShellForce.config.site + '/services/oauth2/token', query)
       end
 
-      attributes = JSON.parse(@agent.page.root.search('p').children.text)
+      attributes = JSON.parse(response.body)
       # TODO : conversion of "issued_at"
       @instance_url = attributes['instance_url']
       @issued_at = attributes['issued_at']
-      @refresh_token = attributes['refresh_token']
       @signature = attributes['signature']
-      @organization_id, @token = attributes['credentials']['token'].split("!")
+      @refresh_token = attributes['refresh_token']
+#     @organization_id, @token = attributes['credentials']['token'].split("!")      
+      @organization_id, @token = attributes['access_token'].split("!")      
       @headers = {"Authorization" => "OAuth #{@token}"}
 
       @token
@@ -79,10 +55,11 @@ module ShellForce
         'refresh_token' => @refresh_token
       }
       
-      @agent.post(ShellForce.config.site + '/services/oauth2/token', query,
-                  set_format("Accept", :json))
+      response = request do
+        @transport.post(ShellForce.config.site + '/services/oauth2/token', query)
+      end
       
-      attributes = JSON.parse(@agent.page.body)
+      attributes = JSON.parse(response.body)
       
       @issued_at = attributes['issued_at']
       @signature = attributes['signature']
@@ -93,66 +70,53 @@ module ShellForce
     end
 
     
-    def head(resource, data={}, format=ShellForce.config.format)
-      headers = @headers.merge(set_format("Accept", format))
-      headers.merge!(@@pretty_print) if ShellForce.config.pp == true
-      
-      @agent.head(@instance_url + resource, data, :headers => headers)
-      
-      return @agent.page.header, @agent.page.body
+    def head(resource, format=ShellForce.config.format)
+      request do
+        headers = @headers.merge(set_format("Accept", format))
+        @transport.head(@instance_url + resource, headers)
+      end
     end
 
     
     def get(resource, format=ShellForce.config.format)
-      headers = @headers.merge(set_format("Accept", format))
-      headers.merge!(@@pretty_print) if ShellForce.config.pp == true     
-      
-      @agent.get(:url => @instance_url + resource, :headers => headers)
-      
-      return @agent.page.header, @agent.page.body
+      request do
+        headers = @headers.merge(set_format("Accept", format))
+        @transport.get(@instance_url + resource, '', headers)
+      end
     end
 
     
     def post(resource, data, format=ShellForce.config.format)
-      headers = @headers.merge(set_format("Accept", format))
-      headers.merge!(@@pretty_print) if ShellForce.config.pp == true
-      headers.merge!(set_format("Content-Type", format))
-      
-      if data.is_a?(String)
-        @agent.post(@instance_url + resource, data, headers)
-      else
-        query = if data.is_a?(Hash)
-                  data.collect {|k,v| "#{k}=#{escape_url(v)}"}
-                elsif data.is_a?(Array)
-                  data.collect {|v| "#{v[0]}=#{escape_url(v[1])}"}
-                else
-                  raise ArguementError.new('The query must be a hash or an array of an array.')
-                end
-        @agent.post(@instance_url + resource + "?#{query.join('&')}", '', headers)
+      request do
+        headers = @headers.merge(set_format("Accept", format))
+        
+        if data.is_a?(String)
+          headers.merge!(set_format("Content-Type", format))
+        elsif data.is_a?(Hash)
+          headers.merge!(set_format("Content-Type", "x-www-form-urlencoded"))
+        else
+          raise ArgumentError.new("data must be a string or a hash")
+        end
+        
+        @transport.post(@instance_url + resource, data, headers)
       end
-
-      return @agent.page.header, @agent.page.body
     end
 
     
     def delete(resource, format=ShellForce.config.format)
-      headers = @headers.merge(set_format("Accept", format))
-      headers.merge!(@@pretty_print) if ShellForce.config.pp == true
-      
-      @agent.delete(@instance_url + resource, {}, :headers => headers)
-      
-      return @agent.page.header, @agent.page.body
+      request do
+        headers = @headers.merge(set_format("Accept", format))
+        @transport.delete(@instance_url + resource, headers)
+      end
     end
 
     
     def patch(resource, data, format=ShellForce.config.format)
-      headers = @headers.merge(set_format("Accept", format))
-      headers.merge!(@@pretty_print) if ShellForce.config.pp == true
-      headers.merge!(set_format("Content-Type", format))
-      
-      @agent.request_with_entity(:patch, @instance_url + resource, data, :headers => headers)
-      
-      return @agent.page.header, @agent.page.body
+      request do
+        headers = @headers.merge(set_format("Accept", format))
+        headers.merge!(set_format("Content-Type", format))
+        @transport.patch(@instance_url + resource, data, headers)
+      end
     end
 
     
@@ -170,32 +134,38 @@ module ShellForce
     
     private
 
-    # Salesforce redirects from one URL to another URL using JavaScript.
-    # I admit that the following code is hacky.
-    def redirect
-      @agent.page.root.search('script').children.find{|c| c.text =~ /var url = '(.+)'/}
-      $1 == nil ? nil : @agent.get($1)
+    def request
+      response = yield
+      response_result = Net::HTTPResponse::CODE_TO_OBJ[response.code.to_s]
+
+      return response if response_result <= Net::HTTPSuccess
+      
+      if response_result <= Net::HTTPUnauthorized
+        if @refresh_token
+          refresh
+        elsif
+          authenticate
+        end
+
+        return request do
+          yield
+        end
+      end
+      
+      raise ShellForce::ResponseCodeError.new(response.code)
     end
 
     
     def submit_query(resource, query, format)
-      headers = @headers.merge(set_format("Accept", format))
-      headers.merge!(@@pretty_print) if ShellForce.config.pp == true
-      
-      @agent.get(:url => @instance_url + resource, :params => {'q' => query},
-                 :headers => headers)
-      
-      return @agent.page.header, @agent.page.body
+      request do
+        headers = @headers.merge(set_format("Accept", format))
+        @transport.get(@instance_url + resource, {'q' => query}, headers)
+      end
     end
-
     
-    def escape_url(text)    
-      CGI.escape(Mechanize::Util.html_unescape(text))
-    end
-
     
     def set_format(header, format)
-      if (format.to_s != "json") && (format.to_s != "xml")
+      if (format.to_s != "json") && (format.to_s != "xml") && (format.to_s != "x-www-form-urlencoded")
         raise ArgumentError.new("#{format} format is not accepted.")
       end
 

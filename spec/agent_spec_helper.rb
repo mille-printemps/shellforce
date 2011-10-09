@@ -1,3 +1,4 @@
+# coding: utf-8
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 require 'webmock/rspec'
@@ -5,8 +6,6 @@ include WebMock::API
 
 shared_context "agent_shared_context" do
   before do
-    ShellForce.config.port = 3000
-    ShellForce.config.host = 'https://localhost'
     ShellForce.config.site = 'https://login.salesforce.com'
     ShellForce.config.client_id = 'client_id'
     ShellForce.config.client_secret = 'client_secret'
@@ -15,7 +14,6 @@ shared_context "agent_shared_context" do
 
     @agent = ShellForce::Agent.new    
     
-    @host = [ShellForce.config.host, ShellForce.config.port].join(':')
     @instance_url = 'https://na1.salesforce.com'
     @organization_id = 'organization_id'    
     @issued_at = '123456789'
@@ -28,88 +26,36 @@ shared_context "agent_shared_context" do
     @new_headers = {"Authorization" => "OAuth #{@new_token}"}
 
     @resource = '/resource'
+    @wrong_resource = '/wrong_resource'
 
     @accept = {"Accept" => "application/#{ShellForce.config.format}"}
     @content_type = {"Content-Type" => "application/#{ShellForce.config.format}"}    
-    @pretty_print = {'X-PrettyPrint' => '1'}
   end
 
   
-  def authenticate
-    body_one = <<-BODY_ONE
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-    <head>
-    <script type='text/javascript'>
-        var url = 'https://login.salesforce.com';
-    </script>
-    </head>
-</html>"
-BODY_ONE
-    
-    body_two = <<-BODY_TWO
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-    <body>
-    <form id='login_form' name='login' method='POST'>
-        <input type='hidden' name='un'>
-        <input type="text" name="username"/>
-        <input type="text" name="pw"/>
-    </form>
-    <body>
-</html>
-BODY_TWO
-
-    body_three = <<-BODY_THREE
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-    <head>
-    <script type='text/javascript'>
-        var url = '/setup/secur/RemoteAccessAuthorizationPage.apexp';
-    </script>
-    </head>
-</html>
-BODY_THREE
-
-    body_four = <<-BODY_FOUR
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-    <head>
-    <script type='text/javascript'>
-        var url = '#{@host + OmniAuth.config.path_prefix + "/forcedotcom/callback"}';
-    </script>
-    </head>
-</html>
-BODY_FOUR
-
-    body_five = <<-BODY_FIVE
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-    <body>
-    <p>
+  def initialize
+    body = <<-BODY
 {"signature":"signature","uid":null,"instance_url":"#{@instance_url}",\
-"credentials":{"token":"#{@organization_id}!#{@token}"},"issued_at":"#{@issued_at}",\
-"refresh_token":"#{@refresh_token}","provider":"forcedotcom"}
-    </p>
-    </body>
-</html>
-BODY_FIVE
+"access_token":"#{@organization_id}!#{@token}","issued_at":"#{@issued_at}"}
+BODY
     
-    stub_request(:get, @host + OmniAuth.config.path_prefix + '/forcedotcom').
-      to_return(:body => body_one, :headers => {'Content-Type' => 'text/html'})
+    query = {
+      'grant_type' => 'password',
+      'client_id' => ShellForce.config.client_id,
+      'client_secret' => ShellForce.config.client_secret,
+      'username' => ShellForce.config.user_name,
+      'password' => ShellForce.config.password
+    }
     
-    stub_request(:get, 'https://login.salesforce.com').
-      to_return(:body => body_two, :headers => {'Content-Type' => 'text/html'})
+    stub_request(:post, ShellForce.config.site + '/services/oauth2/token').
+      with(:query => query).
+      to_return(:body => body)
+  end
+  
+  
+  def authenticate
+    initialize
     
-    stub_request(:post, 'https://login.salesforce.com').
-      to_return(:body => body_three, :headers => {'Content-Type' => 'text/html'})
-    
-    stub_request(:get, 'https://login.salesforce.com/setup/secur/RemoteAccessAuthorizationPage.apexp').
-      to_return(:body => body_four, :headers => {'Content-Type' => 'text/html'})
-    
-    stub_request(:get, @host + OmniAuth.config.path_prefix + '/forcedotcom/callback').
-      to_return(:body => body_five, :headers => {'Content-Type' => 'text/html'})
-
     @agent.authenticate
 
     @agent.instance_url.should == @instance_url
@@ -123,16 +69,13 @@ BODY_FIVE
   def submit_query(resource, &block)
     body = '{"totalSize":0}'
     headers = @headers.merge(@accept)
-    headers.merge!(@pretty_print) if ShellForce.config.pp == true    
     query = {'q' => 'a'}
 
     stub_request(:get, @instance_url + @resource + resource).
-      with(:query => query, :headers => headers).
-      to_return(:body => body)
+      with(:query => query, :headers => headers).to_return(:body => body)
 
-    response_header, response_body = block.call(@resource, 'a')
-    response_body.should == body
+    response = block.call(@resource, 'a')
+    response.body.should == body
   end
-  
 end
 

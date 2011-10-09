@@ -2,7 +2,6 @@
 
 require 'rubygems'
 require 'shellforce/config'
-require 'shellforce/server'
 require 'shellforce/agent'
 require 'shellforce/rest'
 require 'shellforce/util'
@@ -24,26 +23,12 @@ $KCODE="UTF8"
 
 module ShellForce
   class Client
-    def initialize(config = ShellForce.config.rack_config)
+    def initialize
       @agent = ShellForce::Agent.new
-      @server = ShellForce::Server.new(config)
-
-      status = begin
-                 @agent.ping.size
-               rescue
-                 fork do
-                   @server.start
-                 end
-               end
-
-      unless status == 0
-        @pid = status
-        sleep 2
-      end
-
       @agent.authenticate
-      header, body = @agent.get("/services/data")
-      @version = JSON.parse(body).collect {|v| v["url"]}.sort[-1]
+      
+      response = @agent.get("/services/data")
+      @url = JSON.parse(response.body).collect {|u| u["url"]}.sort[-1]
     end
 
     
@@ -51,6 +36,11 @@ module ShellForce
       @agent.instance_url
     end
 
+    
+    def organization_id
+      @agent.organization_id
+    end
+    
     
     def token
       @agent.token
@@ -67,22 +57,15 @@ module ShellForce
     end
 
     
-    def shutdown
-      begin
-        n = Process.kill("SIGKILL", @pid)
-        if n == 1
-          display "Process #{pid} terminated."
-        else
-          display "Process #{pid} NOT terminated."
-        end
-      rescue AugmentError
-        raise $!
+    def head(resource, format=ShellForce.config.format)
+      Rest.request(@url + resource, format) do |r, f|
+        @agent.head(r, f)
       end
     end
 
     
     def get(resource, format=ShellForce.config.format)
-      Rest.request(@version + resource, format) do |r, f|
+      Rest.request(@url + resource, format) do |r, f|
         @agent.get(r, f)
       end
     end
@@ -92,21 +75,21 @@ module ShellForce
     # post '/chatter/feeds/news/me/feed-items', {"text" => "test"}
     # Note that the first data is String and the second one is hash    
     def post(resource, data, format=ShellForce.config.format)
-      Rest.request(@version + resource, data, format) do |r, d, f|
+      Rest.request(@url + resource, data, format) do |r, d, f|
         @agent.post(r, d, f)
       end
     end
 
     
     def delete(resource, format=ShellForce.config.format)
-      Rest.request(@version + resource, format) do |r, f|
+      Rest.request(@url + resource, format) do |r, f|
         @agent.delete(r, f)
       end
     end
 
     
     def patch(resource, data, format=ShellForce.config.format)
-      Rest.request(@version + resource, data, format) do |r, d, f|
+      Rest.request(@url + resource, data, format) do |r, d, f|
         @agent.patch(r, d, f)
       end
     end
@@ -114,18 +97,18 @@ module ShellForce
     
     def query(query, format=ShellForce.config.format)
       Rest.request(query, format) do |q, f|
-        @agent.query(@version, q, f)
+        @agent.query(@url, q, f)
       end
     end
 
     
     def search(query, format=ShellForce.config.format)
       Rest.request(query, format) do |q, f|
-        @agent.search(@version, q, f)
+        @agent.search(@url, q, f)
       end
     end
-
-    attr_reader :pid, :version
+    
+    attr_reader :url
     
   end
 end

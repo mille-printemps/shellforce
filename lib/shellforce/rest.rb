@@ -1,30 +1,49 @@
 # coding : utf-8
 
-require 'rubygems'
-require 'mechanize'
+require 'shellforce/exception'
 require 'shellforce/config'
 
 module ShellForce
   class Rest
     def self.request(*args)
       begin
-        # TODO : plug-in
+        args = preprocess(*args)
+        
         start = Time.now
-        response_header, response_body = yield(*args)
+        response = yield(*args)
         stop = Time.now
-        # TODO : plug-in
-        return response_header, response_body, stop-start
-      rescue Mechanize::ResponseCodeError => rce
+        
+        body = postprocess(response.body)
+        return body, stop-start
+      rescue ShellForce::ResponseCodeError => rce
         raise rce.response_code + ' : ' + @@response_code_description[rce.response_code]
-      rescue Mechanize::RedirectLimitReachedError        
+      rescue ShellForce::RedirectLimitReachedError => rlre
+        raise rce.response_code + ' : ' + @@response_code_description[rlre.response_code]
       rescue ArgumentError
-      rescue EOFError
       rescue StandardError
         raise $!
       end
     end
 
     private
+
+    def self.preprocess(*args)
+      ShellForce.config.preprocess.each do |p|
+        args = p.call(*args)
+      end
+
+      return args
+    end
+
+    
+    def self.postprocess(body)
+      ShellForce.config.postprocess.each do |p|
+        body = p.call(body)
+      end
+
+      return body
+    end
+    
 
     @@response_code_description = {
       '300' => 'The value used for an external ID exists in more than one record. The response boby contains the list of matching records.',

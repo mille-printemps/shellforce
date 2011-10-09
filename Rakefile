@@ -25,8 +25,6 @@ Jeweler::Tasks.new do |gem|
   gem.test_files = FileList["{spec}/**/*"]
   gem.executables << 'shellforce'
   gem.add_runtime_dependency("omniauth", "= 0.2.0")
-  gem.add_runtime_dependency("multi_json", "= 0.0.5")  
-  gem.add_runtime_dependency("mechanize", ">= 1.0.0")
   gem.add_runtime_dependency("json", ">= 1.4.6")
   gem.add_runtime_dependency("rack", ">= 1.2.3")
   gem.add_runtime_dependency("sinatra", ">= 1.1.0")
@@ -39,6 +37,7 @@ require 'rspec/core'
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.pattern = FileList['spec/**/*_spec.rb']
+  spec.rspec_opts = ['--colour --format progress --require rubygems']
 end
 
 RSpec::Core::RakeTask.new(:rcov) do |spec|

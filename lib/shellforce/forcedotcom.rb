@@ -2,7 +2,6 @@
 
 require 'rubygems'
 require 'omniauth/oauth'
-require 'multi_json'
 require 'shellforce/config'
 
 module OmniAuth

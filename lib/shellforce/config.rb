@@ -33,8 +33,9 @@ module ShellForce
 
     attr_accessor :port, :document_root, :private_key, :cert, \
     :server_logger, :server_access_logger, \
-    :home, :site, :client_id, :client_secret, :host, \
-    :user_name, :password, :user_agent, :rack_config, :format, :pp, :logging
+    :home, :site, :client_id, :client_secret, :host, :path_prefix, \
+    :user_name, :password, :user_agent, :rack_config, :format, :pp, :logging, \
+    :preprocess, :postprocess
   end
 
   
@@ -61,18 +62,23 @@ ShellForce.configure :default do
   set :private_key => File.join(ShellForce.home, 'key.pem')
   set :cert => File.join(ShellForce.home, 'cert.pem')
   set :server_logger => WEBrick::Log::new($stderr, WEBrick::Log::FATAL)
-  set :server_access_logger => []  
-  # ShellForce configuration
+  set :server_access_logger => []
+  
+  # OAuth2 configuration
+  set :host => 'https://localhost'
+  set :path_prefix => '/auth'
+  set :rack_config => File.join(File.dirname(File.expand_path(__FILE__)), 'config.ru')
+  
+  # ShellForce configuration  
   set :home => ShellForce.home
   set :site => 'https://login.salesforce.com'
   set :client_id => nil
   set :client_secret => nil
-  set :host => 'https://localhost'
   set :user_name => nil
   set :password => nil
-  set :user_agent => 'Mac FireFox'
-  set :rack_config => File.join(File.dirname(File.expand_path(__FILE__)), 'config.ru')
+  set :user_agent => 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2) Gecko/20100115 Firefox/3.6'
   set :format => :json
-  set :pp => false
   set :logging => false
+  set :preprocess => [lambda{|*args| return args}]
+  set :postprocess => [lambda{|body| return body}]
 end
