@@ -5,7 +5,7 @@ require 'json'
 require 'nokogiri'
 require 'shellforce/config'
 require 'shellforce/util'
-include ShellForce::Util
+include ShellForce::Util    
 
 module ShellForce
   module Command
@@ -14,15 +14,16 @@ module ShellForce
       @xsl ||= Nokogiri::XSLT(XSLT)
     end
     
-    def pp(response)
-      if ShellForce.config.format == :json
-        display JSON.pretty_generate(JSON.parse(response[0]))
-      elsif ShellForce.config.format == :xml
-        display xsl.apply_to(Nokogiri(response[0])).to_s
+    def pp(headers, body)
+      format = headers["content-type"][0]
+      if format.match("json")
+        display JSON.pretty_generate(JSON.parse(body))
+      elsif format.match("xml")
+        display xsl.apply_to(Nokogiri(body)).to_s
       else
-        display response[0]
+        display body
       end
-      display "%s seconds" % response[1]      
+      return headers, body
     end
 
     XSLT = <<-XSLT
@@ -76,10 +77,6 @@ XSLT
     
   end
 end
-
-# alias
-
-# pretty query result
 
 
 

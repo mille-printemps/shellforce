@@ -44,7 +44,6 @@ Gem::Specification.new do |s|
     "spec/client_spec.rb",
     "spec/config_spec.rb",
     "spec/rest_spec.rb",
-    "spec/shellforce_spec.rb",
     "spec/spec_helper.rb",
     "spec/transport_spec.rb",
     "spec/util_spec.rb"
@@ -54,7 +53,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.6.2}
   s.summary = %q{Simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
-  s.test_files = ["spec/agent_spec.rb", "spec/agent_spec_helper.rb", "spec/client_spec.rb", "spec/config_spec.rb", "spec/rest_spec.rb", "spec/shellforce_spec.rb", "spec/spec_helper.rb", "spec/transport_spec.rb", "spec/util_spec.rb"]
+  s.test_files = ["spec/agent_spec.rb", "spec/agent_spec_helper.rb", "spec/client_spec.rb", "spec/config_spec.rb", "spec/rest_spec.rb", "spec/spec_helper.rb", "spec/transport_spec.rb", "spec/util_spec.rb"]
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
@@ -64,10 +63,11 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.6.2"])
       s.add_development_dependency(%q<rcov>, [">= 0"])
-      s.add_runtime_dependency(%q<omniauth>, ["= 0.2.0"])
+      s.add_runtime_dependency(%q<nokogiri>, [">= 1.4.4"])
       s.add_runtime_dependency(%q<json>, [">= 1.4.6"])
       s.add_runtime_dependency(%q<rack>, [">= 1.2.3"])
       s.add_runtime_dependency(%q<sinatra>, [">= 1.1.0"])
+      s.add_runtime_dependency(%q<omniauth>, ["= 0.2.0"])
       s.add_development_dependency(%q<webmock>, [">= 1.7.4"])
       s.add_development_dependency(%q<rspec>, [">= 2.6"])
     else
@@ -75,10 +75,11 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.6.2"])
       s.add_dependency(%q<rcov>, [">= 0"])
-      s.add_dependency(%q<omniauth>, ["= 0.2.0"])
+      s.add_dependency(%q<nokogiri>, [">= 1.4.4"])
       s.add_dependency(%q<json>, [">= 1.4.6"])
       s.add_dependency(%q<rack>, [">= 1.2.3"])
       s.add_dependency(%q<sinatra>, [">= 1.1.0"])
+      s.add_dependency(%q<omniauth>, ["= 0.2.0"])
       s.add_dependency(%q<webmock>, [">= 1.7.4"])
       s.add_dependency(%q<rspec>, [">= 2.6"])
     end
@@ -87,10 +88,11 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<bundler>, ["~> 1.0.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.6.2"])
     s.add_dependency(%q<rcov>, [">= 0"])
-    s.add_dependency(%q<omniauth>, ["= 0.2.0"])
+    s.add_dependency(%q<nokogiri>, [">= 1.4.4"])
     s.add_dependency(%q<json>, [">= 1.4.6"])
     s.add_dependency(%q<rack>, [">= 1.2.3"])
     s.add_dependency(%q<sinatra>, [">= 1.1.0"])
+    s.add_dependency(%q<omniauth>, ["= 0.2.0"])
     s.add_dependency(%q<webmock>, [">= 1.7.4"])
     s.add_dependency(%q<rspec>, [">= 2.6"])
   end

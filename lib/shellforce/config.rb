@@ -80,5 +80,5 @@ ShellForce.configure :default do
   set :format => :json
   set :logging => false
   set :preprocess => [lambda{|*args| return args}]
-  set :postprocess => [lambda{|body| return body}]
+  set :postprocess => [lambda{|headers, body| return headers, body}]
 end

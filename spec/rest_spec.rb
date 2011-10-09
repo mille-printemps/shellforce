@@ -5,11 +5,17 @@ describe ShellForce::Rest do
   
   it "executes a block and returns its result and response time" do
 
+    ShellForce.config.postprocess = [lambda{|h, b| return h, b}]
+    
     # A dummy response
     response = []
     class << response
       def body
         "abc"
+      end
+
+      def to_hash
+        {"content-type" => ["application/json"]}
       end
     end
     

@@ -12,8 +12,8 @@ module ShellForce
         start = Time.now
         response = yield(*args)
         stop = Time.now
-        
-        body = postprocess(response.body)
+
+        body = postprocess(response.to_hash, response.body)
         return body, stop-start
       rescue ShellForce::ResponseCodeError => rce
         raise rce.response_code + ' : ' + @@response_code_description[rce.response_code]
@@ -36,9 +36,9 @@ module ShellForce
     end
 
     
-    def self.postprocess(body)
+    def self.postprocess(headers, body)
       ShellForce.config.postprocess.each do |p|
-        body = p.call(body)
+        headers, body = p.call(headers, body)
       end
 
       return body
