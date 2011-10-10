@@ -9,10 +9,10 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chiharu Kawatake"]
-  s.date = %q{2011-10-09}
+  s.date = %q{2011-10-10}
   s.description = %q{A simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
   s.email = %q{}
-  s.executables = ["shellforce", "create_shellforce_config", "shellforce"]
+  s.executables = ["create_shellforce_config", "shellforce", "shellforce"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -59,39 +59,57 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<rspec>, ["~> 2.3.0"])
+      s.add_development_dependency(%q<rspec>, ["~> 2.6.0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.6.2"])
       s.add_development_dependency(%q<rcov>, [">= 0"])
+      s.add_development_dependency(%q<nokogiri>, [">= 1.4.4"])
+      s.add_development_dependency(%q<json>, [">= 1.4.6"])
+      s.add_development_dependency(%q<rack>, [">= 1.3.4"])
+      s.add_development_dependency(%q<sinatra>, [">= 1.3.1"])
+      s.add_development_dependency(%q<omniauth>, ["= 0.2.0"])
+      s.add_development_dependency(%q<webmock>, [">= 1.7.4"])
       s.add_runtime_dependency(%q<nokogiri>, [">= 1.4.4"])
       s.add_runtime_dependency(%q<json>, [">= 1.4.6"])
-      s.add_runtime_dependency(%q<rack>, [">= 1.2.3"])
-      s.add_runtime_dependency(%q<sinatra>, [">= 1.1.0"])
+      s.add_runtime_dependency(%q<rack>, [">= 1.3.4"])
+      s.add_runtime_dependency(%q<sinatra>, [">= 1.3.1"])
       s.add_runtime_dependency(%q<omniauth>, ["= 0.2.0"])
       s.add_development_dependency(%q<webmock>, [">= 1.7.4"])
       s.add_development_dependency(%q<rspec>, [">= 2.6"])
     else
-      s.add_dependency(%q<rspec>, ["~> 2.3.0"])
+      s.add_dependency(%q<rspec>, ["~> 2.6.0"])
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.6.2"])
       s.add_dependency(%q<rcov>, [">= 0"])
       s.add_dependency(%q<nokogiri>, [">= 1.4.4"])
       s.add_dependency(%q<json>, [">= 1.4.6"])
-      s.add_dependency(%q<rack>, [">= 1.2.3"])
-      s.add_dependency(%q<sinatra>, [">= 1.1.0"])
+      s.add_dependency(%q<rack>, [">= 1.3.4"])
+      s.add_dependency(%q<sinatra>, [">= 1.3.1"])
+      s.add_dependency(%q<omniauth>, ["= 0.2.0"])
+      s.add_dependency(%q<webmock>, [">= 1.7.4"])
+      s.add_dependency(%q<nokogiri>, [">= 1.4.4"])
+      s.add_dependency(%q<json>, [">= 1.4.6"])
+      s.add_dependency(%q<rack>, [">= 1.3.4"])
+      s.add_dependency(%q<sinatra>, [">= 1.3.1"])
       s.add_dependency(%q<omniauth>, ["= 0.2.0"])
       s.add_dependency(%q<webmock>, [">= 1.7.4"])
       s.add_dependency(%q<rspec>, [">= 2.6"])
     end
   else
-    s.add_dependency(%q<rspec>, ["~> 2.3.0"])
+    s.add_dependency(%q<rspec>, ["~> 2.6.0"])
     s.add_dependency(%q<bundler>, ["~> 1.0.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.6.2"])
     s.add_dependency(%q<rcov>, [">= 0"])
     s.add_dependency(%q<nokogiri>, [">= 1.4.4"])
     s.add_dependency(%q<json>, [">= 1.4.6"])
-    s.add_dependency(%q<rack>, [">= 1.2.3"])
-    s.add_dependency(%q<sinatra>, [">= 1.1.0"])
+    s.add_dependency(%q<rack>, [">= 1.3.4"])
+    s.add_dependency(%q<sinatra>, [">= 1.3.1"])
+    s.add_dependency(%q<omniauth>, ["= 0.2.0"])
+    s.add_dependency(%q<webmock>, [">= 1.7.4"])
+    s.add_dependency(%q<nokogiri>, [">= 1.4.4"])
+    s.add_dependency(%q<json>, [">= 1.4.6"])
+    s.add_dependency(%q<rack>, [">= 1.3.4"])
+    s.add_dependency(%q<sinatra>, [">= 1.3.1"])
     s.add_dependency(%q<omniauth>, ["= 0.2.0"])
     s.add_dependency(%q<webmock>, [">= 1.7.4"])
     s.add_dependency(%q<rspec>, [">= 2.6"])

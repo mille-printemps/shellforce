@@ -39,7 +39,7 @@ describe ShellForce::Rest do
         method.call(a,b,c)
       end
     rescue StandardError => e
-      e.exception.to_str.should == "StandardError"
+      e.exception.to_s.should == "StandardError"
     end
   end
   

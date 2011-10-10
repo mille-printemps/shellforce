@@ -12,9 +12,8 @@ group :development do
   gem "rcov", ">= 0"
   gem "nokogiri", ">= 1.4.4"
   gem "json", ">= 1.4.6"
-  gem "rack", ">= 1.2.3"
-  gem "sinatra", ">= 1.1.0"
+  gem "rack", ">= 1.3.4"
+  gem "sinatra", ">= 1.3.1"
   gem "omniauth", "= 0.2.0"
   gem "webmock", ">=1.7.4"
-  gem "iconv", ">= 0.1"
 end

@@ -18,8 +18,7 @@ rescue
   exit!
 end
 
-
-$KCODE="UTF8"
+$KCODE="UTF8" if RUBY_VERSION < "1.9"
 
 module ShellForce
   class Client
