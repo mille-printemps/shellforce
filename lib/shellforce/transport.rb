@@ -45,6 +45,7 @@ module ShellForce
         "Accept-Charset" => "ISO-8859-1,utf-8;q=0.7,*;q=0.7"
       }
       @log = args[:log] || nil
+      @connection_cache = {}
     end
     
     attr_reader :redirection_code, :follow_redirection, :redirection_limit, :headers
@@ -83,15 +84,30 @@ module ShellForce
     end
 
 
-    def uri_http(url, data)
+    def uri(url, data)
       URI.parse(url).tap {|u| u.query = query(data) if data.is_a?(Hash) && data.size != 0}
     end
 
-    
-    def net_http(uri)
-      Net::HTTP.new(uri.host, uri.port).tap {|h| h.use_ssl = true if uri.is_a?(URI::HTTPS)}
+
+    def connect(uri)
+      connection = @connection_cache["#{uri.host}:#{uri.port}"] ||= {}
+      connection[:http] ||= Net::HTTP.new(uri.host, uri.port).tap {|h| h.use_ssl = true if uri.is_a?(URI::HTTPS)}
+      
+      if connection[:last_request_time] && @keep_alive_time < Time.now.to_i - connection[:last_request_time]
+        connection[:http].finish
+      end
+
+      connection[:last_request_time] = Time.now.to_i
+      yield(connection[:http])
     end
 
+    
+=begin 
+    def net_http(uri)
+      @connection_cache["#{uri.host}:#{uri.port}"] ||=
+        Net::HTTP.new(uri.host, uri.port).tap {|h| h.use_ssl = true if uri.is_a?(URI::HTTPS)}
+    end
+=end
     
     def request(method, uri, headers)
       Net::HTTP.const_get(method.to_s.capitalize).new(uri.request_uri, headers)
@@ -106,15 +122,21 @@ module ShellForce
       data = args[:data] || ''
       headers = args[:headers] || {}
       
-      uri = uri_http(url, data)
+      uri = uri(url, data)
       headers.merge!(@headers)      
 
       log_request(method, uri, headers) if log
-      
-      response = net_http(uri).start do |http|
-        http.request(request(method, uri, headers), data.is_a?(String) ? data : '')
-      end
 
+      response = connect(uri) do |connection|
+        connection.start unless connection.started?
+        connection.request(request(method, uri, headers), data.is_a?(String) ? data : '')
+      end
+      
+=begin
+      connection = net_http(uri)
+      connection.start unless connection.started?
+      response = connection.request(request(method, uri, headers), data.is_a?(String) ? data : '')
+=end
       log_response(response) if log
       
       if Net::HTTPResponse::CODE_TO_OBJ[response.code.to_s] <= Net::HTTPRedirection
