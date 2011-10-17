@@ -2,14 +2,13 @@
 
 require 'rubygems'
 require 'rack'
-require 'omniauth'
 require 'webrick'
 require 'webrick/https'
-require 'shellforce/forcedotcom'
+require 'openssl'
 require 'shellforce/config'
-require 'shellforce/auth'
+require 'shellforce/oauth2'
+require 'shellforce/application'
 
-OmniAuth.config.full_host = [ShellForce.config.host, ShellForce.config.port].join(':')
 
 configuration = {
 :Port => ShellForce.config.port,
@@ -24,9 +23,9 @@ configuration = {
 }
 
 application = Rack::Session::Cookie.new(
-  OmniAuth::Builder.new ShellForce::Auth.new do
-    provider :forcedotcom, ShellForce.config.client_id, ShellForce.config.client_secret    
-  end
+  ShellForce::OAuth2.new(
+    ShellForce::Application.new
+  )
 )
 
 Rack::Handler::WEBrick.run application, configuration

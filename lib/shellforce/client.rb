@@ -22,12 +22,13 @@ $KCODE="UTF8" if RUBY_VERSION < "1.9"
 
 module ShellForce
   class Client
-    def initialize
-      @agent = ShellForce::Agent.new
+    def initialize(args={})
+      @agent = ShellForce::Agent.new(args)
       @agent.authenticate
       
       response = @agent.get("/services/data")
-      @url = JSON.parse(response.body).collect {|u| u["url"]}.sort[-1]
+      @current_path = JSON.parse(response.body).collect {|u| u["url"]}.sort[-1]
+      @saved_path = ""
     end
 
     
@@ -51,20 +52,37 @@ module ShellForce
     end
 
     
+    def user_name
+      @agent.user_name
+    end
+
+    
+    def to(type)
+      if type == :apex
+        @saved_path = @current_path.dup
+        @current_path.gsub!(/\/services\/data\/v\d\d\.0/, '/services/apexrest')
+      elsif type == :data
+        @current_path.gsub!(/\/services\/apexrest/, @saved_path)
+      else
+        "#{type} is not supported"
+      end
+    end
+
+    
     def refresh
       @agent.refresh
     end
 
     
     def head(resource, format=ShellForce.config.format)
-      Rest.request(@url + resource, format) do |r, f|
+      Rest.request(@current_path + resource, format) do |r, f|
         @agent.head(r, f)
       end
     end
 
     
     def get(resource, format=ShellForce.config.format)
-      Rest.request(@url + resource, format) do |r, f|
+      Rest.request(@current_path + resource, format) do |r, f|
         @agent.get(r, f)
       end
     end
@@ -74,21 +92,21 @@ module ShellForce
     # post '/chatter/feeds/news/me/feed-items', {"text" => "test"}
     # Note that the first data is String and the second one is hash    
     def post(resource, data, format=ShellForce.config.format)
-      Rest.request(@url + resource, data, format) do |r, d, f|
+      Rest.request(@current_path + resource, data, format) do |r, d, f|
         @agent.post(r, d, f)
       end
     end
 
     
     def delete(resource, format=ShellForce.config.format)
-      Rest.request(@url + resource, format) do |r, f|
+      Rest.request(@current_path + resource, format) do |r, f|
         @agent.delete(r, f)
       end
     end
 
     
     def patch(resource, data, format=ShellForce.config.format)
-      Rest.request(@url + resource, data, format) do |r, d, f|
+      Rest.request(@current_path + resource, data, format) do |r, d, f|
         @agent.patch(r, d, f)
       end
     end
@@ -96,18 +114,18 @@ module ShellForce
     
     def query(query, format=ShellForce.config.format)
       Rest.request(query, format) do |q, f|
-        @agent.query(@url, q, f)
+        @agent.query(@current_path, q, f)
       end
     end
 
     
     def search(query, format=ShellForce.config.format)
       Rest.request(query, format) do |q, f|
-        @agent.search(@url, q, f)
+        @agent.search(@current_path, q, f)
       end
     end
     
-    attr_reader :url
+    attr_reader :current_path
     
   end
 end

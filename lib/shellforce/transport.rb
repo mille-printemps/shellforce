@@ -76,6 +76,11 @@ module ShellForce
       send(:method => :delete, :url => url, :headers => headers)
     end
 
+
+    def build_uri(url, data)
+      uri(url, data).to_s
+    end
+    
     
     private
 
@@ -91,14 +96,14 @@ module ShellForce
 
     def connect(uri)
       connection = @connection_cache["#{uri.host}:#{uri.port}"] ||= {}
-      connection[:http] ||= Net::HTTP.new(uri.host, uri.port).tap {|h| h.use_ssl = true if uri.is_a?(URI::HTTPS)}
+      connection[:object] ||= Net::HTTP.new(uri.host, uri.port).tap {|h| h.use_ssl = true if uri.is_a?(URI::HTTPS)}
       
       if connection[:last_request_time] && @keep_alive_time < Time.now.to_i - connection[:last_request_time]
-        connection[:http].finish
+        connection[:object].finish
       end
 
       connection[:last_request_time] = Time.now.to_i
-      yield(connection[:http])
+      yield(connection[:object])
     end
 
     

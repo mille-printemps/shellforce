@@ -43,7 +43,8 @@ module ShellForce
 
       return body
     end
-    
+
+    private
 
     @@response_code_description = {
       '300' => 'The value used for an external ID exists in more than one record. The response boby contains the list of matching records.',

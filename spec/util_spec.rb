@@ -31,7 +31,6 @@ describe ShellForce::Util do
 
     ShellForce.config.client_id.should == ''
     ShellForce.config.client_secret.should == ''
-    ShellForce.config.pp.should == false
     ShellForce.config.logging.should == false
 
     FileUtils.remove(@local_config) if File.exists?(@local_config)  

@@ -5,11 +5,19 @@ require 'json'
 require 'shellforce/transport'
 require 'shellforce/config'
 require 'shellforce/exception'
+require 'shellforce/util'
 
 module ShellForce
   class Agent
-    def initialize
+    def initialize(args={})
       @transport = ShellForce::Transport.new
+
+      @instance_url = args['instance_url']
+      @issued_at = args['issued_at']
+      @signature = args['signature']
+      @refresh_token = args['refresh_token']
+      @organization_id, @token = (args['access_token'] ? args['access_token'].split('!') : [nil, nil])
+      @headers = {"Authorization" => "OAuth #{@token}"} if @token
 
       if ShellForce.config.logging
         require 'logger'
@@ -18,28 +26,31 @@ module ShellForce
       end
     end
 
-    
-    def authenticate
-      # username and password flow
+    # username and password flow    
+    def authenticate(user_name=ShellForce.config.user_name, password=ShellForce.config.password)
+      if user_name == nil || password == nil
+        user_name, password = ask_for_credentials
+      end
+
       query = {
         'grant_type' => 'password',
         'client_id' => ShellForce.config.client_id,
         'client_secret' => ShellForce.config.client_secret,
-        'username' => ShellForce.config.user_name,
-        'password' => ShellForce.config.password
+        'username' => user_name,
+        'password' => password
       }
 
       response = request do
         @transport.post(ShellForce.config.site + '/services/oauth2/token', query)
       end
 
+      @user_name = user_name
+
       attributes = JSON.parse(response.body)
       # TODO : conversion of "issued_at"
       @instance_url = attributes['instance_url']
       @issued_at = attributes['issued_at']
       @signature = attributes['signature']
-      @refresh_token = attributes['refresh_token']
-#     @organization_id, @token = attributes['credentials']['token'].split("!")      
       @organization_id, @token = attributes['access_token'].split("!")      
       @headers = {"Authorization" => "OAuth #{@token}"}
 
@@ -129,7 +140,7 @@ module ShellForce
       submit_query(resource + '/search', query, format)
     end
     
-    attr_reader :host, :instance_url, :issued_at, :organization_id, :token, :headers
+    attr_reader :instance_url, :issued_at, :organization_id, :token, :headers, :user_name
 
     
     private

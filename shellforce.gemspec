@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chiharu Kawatake"]
-  s.date = %q{2011-10-10}
+  s.date = %q{2011-10-18}
   s.description = %q{A simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
   s.email = %q{}
   s.executables = ["create_shellforce_config", "shellforce", "shellforce"]
@@ -28,13 +28,13 @@ Gem::Specification.new do |s|
     "bin/shellforce",
     "lib/shellforce.rb",
     "lib/shellforce/agent.rb",
-    "lib/shellforce/auth.rb",
+    "lib/shellforce/application.rb",
     "lib/shellforce/client.rb",
     "lib/shellforce/command.rb",
     "lib/shellforce/config.rb",
     "lib/shellforce/config.ru",
     "lib/shellforce/exception.rb",
-    "lib/shellforce/forcedotcom.rb",
+    "lib/shellforce/oauth2.rb",
     "lib/shellforce/rest.rb",
     "lib/shellforce/server.rb",
     "lib/shellforce/transport.rb",
@@ -73,7 +73,6 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<json>, [">= 1.4.6"])
       s.add_runtime_dependency(%q<rack>, [">= 1.3.4"])
       s.add_runtime_dependency(%q<sinatra>, [">= 1.3.1"])
-      s.add_runtime_dependency(%q<omniauth>, ["= 0.2.0"])
       s.add_development_dependency(%q<webmock>, [">= 1.7.4"])
       s.add_development_dependency(%q<rspec>, [">= 2.6"])
     else
@@ -91,7 +90,6 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<json>, [">= 1.4.6"])
       s.add_dependency(%q<rack>, [">= 1.3.4"])
       s.add_dependency(%q<sinatra>, [">= 1.3.1"])
-      s.add_dependency(%q<omniauth>, ["= 0.2.0"])
       s.add_dependency(%q<webmock>, [">= 1.7.4"])
       s.add_dependency(%q<rspec>, [">= 2.6"])
     end
@@ -110,7 +108,6 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<json>, [">= 1.4.6"])
     s.add_dependency(%q<rack>, [">= 1.3.4"])
     s.add_dependency(%q<sinatra>, [">= 1.3.1"])
-    s.add_dependency(%q<omniauth>, ["= 0.2.0"])
     s.add_dependency(%q<webmock>, [">= 1.7.4"])
     s.add_dependency(%q<rspec>, [">= 2.6"])
   end
