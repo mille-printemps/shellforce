@@ -17,6 +17,11 @@ module ShellForce
 
     
     def call(env)
+      dup.call!(env)
+    end
+    
+    
+    def call!(env)
       @request = Rack::Request.new(env)
       
       if current_path == ShellForce.config.path
@@ -56,6 +61,7 @@ module ShellForce
       end
     end
 
+    attr_reader :full_path
     
     private
     

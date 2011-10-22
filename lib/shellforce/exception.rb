@@ -50,7 +50,7 @@ module ShellForce
       to_s
     end
 
-    attr_reader :error, :error_
+    attr_reader :error_code, :error_description
 
     private
     
