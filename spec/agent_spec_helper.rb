@@ -17,6 +17,7 @@ shared_context "agent_shared_context" do
     @instance_url = 'https://na1.salesforce.com'
     @organization_id = 'organization_id'    
     @issued_at = '123456789'
+    @signature = 'signature'
     @token = 'token'
     @refresh_token = 'refresh_token'
     @headers = {"Authorization" => "OAuth #{@token}"}
@@ -35,7 +36,7 @@ shared_context "agent_shared_context" do
   
   def initialize
     body = <<-BODY
-{"signature":"signature","uid":null,"instance_url":"#{@instance_url}",\
+{"signature":"#{@signature}","uid":null,"instance_url":"#{@instance_url}",\
 "access_token":"#{@organization_id}!#{@token}","issued_at":"#{@issued_at}"}
 BODY
     
