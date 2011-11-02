@@ -28,7 +28,8 @@ Jeweler::Tasks.new do |gem|
   gem.add_runtime_dependency("json", ">= 1.4.6")
   gem.add_runtime_dependency("rack", ">= 1.3.4")
   gem.add_runtime_dependency("sinatra", ">= 1.3.1")
-  gem.add_development_dependency("nokogiri", ">= 1.4.4")  
+  gem.add_development_dependency("nokogiri", ">= 1.4.4")
+  gem.add_development_dependency("haml", ">= 3.1.3")    
   gem.add_development_dependency("webmock", ">=1.7.4")  
   gem.add_development_dependency("rspec", ">=2.6")
 end

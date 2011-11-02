@@ -31,10 +31,11 @@ module ShellForce
       Configuration.instance[name].each_pair {|k ,v| self.send("#{k}=", v)}
     end
 
-    attr_accessor :port, :document_root, :private_key, :cert, \
+    attr_accessor :host, :port, :document_root, :private_key, :cert, \
     :server_logger, :server_access_logger, \
-    :home, :site, :client_id, :client_secret, :host, :path, \
-    :user_name, :password, :user_agent, :rack_config, :format, :logging, \
+    :path, :auth_path, :rack_config, \
+    :home, :site, :client_id, :client_secret, \
+    :user_name, :password, :user_agent, :format, :logging, \
     :preprocess, :postprocess
   end
 
@@ -67,7 +68,8 @@ ShellForce.configure :default do
   set :server_access_logger => []
   
   # OAuth2 configuration
-  set :path => '/shellforce/auth'
+  set :path => '/shellforce'
+  set :auth_path => '/shellforce/auth'
   set :rack_config => File.join(File.dirname(File.expand_path(__FILE__)), 'config.ru')
   
   # ShellForce configuration  

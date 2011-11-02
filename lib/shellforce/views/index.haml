@@ -1,0 +1,63 @@
+!!! XHTML
+%html
+  %head
+    %title= "ShellForce REST Explorer"
+    %meta{:'http-equiv' => 'Content-Laugage', :content => 'UTF-8'}
+    %meta{:'http-equiv' => 'Content-Type', :content => 'text/html; charset=UTF-8'}      
+    %link{:rel => 'stylesheet', :href => "css/master.css", :type => 'text/css'}
+    %link{:rel => 'stylesheet', :href => "css/pro_dropdown.css", :type => 'text/css'}
+    %link{:rel => 'stylesheet', :href => "css/restexplorer.css", :type => 'text/css'}
+    %link{:rel => 'stylesheet', :href => "css/simpletree.css", :type => 'text/css'}
+    :javascript
+        var shellforce_api = "#{shellforce_api}"      
+    %script{:type => 'text/javascript', :src => "js/jquery-1.6.4.min.js"}
+    %script{:type => 'text/javascript', :src => "js/pro_dropdown.js"}
+    %script{:type => 'text/javascript', :src => "js/simpletreemenu.js"}
+    %script{:type => 'text/javascript', :src => "js/restexplorer.js"}
+    %script{:type => 'text/javascript', :src => "js/shellforce.js"}
+      :javascript
+        var restExplorer = function() {
+        function showWaitingIndicator() {
+        document.getElementById('waitingIndicator').style.display = 'inline';
+        }
+        bindEvent(document.getElementById('execBtn'), 'click', showWaitingIndicator);
+
+        if (document.getElementsByClassName) {
+        var linkables = document.getElementsByClassName('RestLinkable');
+        for (var link in linkables) {
+        bindEvent(linkables[link], 'click', showWaitingIndicator);
+        }
+        }
+        }();
+  %body
+    %script{:type => 'text/javascript', :src => "js/wz_tooltip.js"}    
+    %div{:id => 'mainBlock'}
+      %table{:width => '100%', :border => '0'}
+        %tr
+          %td{:id => 'pageTitle'}
+            ShellForce REST Explorer - a clone of REST Explorer in |
+            %a{:href => url('https://workbench.developerforce.com/login.php')} Workbench
+      %div
+        %label
+          %input{:type => 'radio', :name => 'requestMethod', :value => 'GET', :checked => 'checked', :onclick=> 'toggleRequestBodyDisplay(this, false);'}GET
+        %label
+          %input{:type => 'radio', :name => 'requestMethod', :value => 'POST', :onclick => 'toggleRequestBodyDisplay(this, true);'}POST
+        %label
+          %input{:type => 'radio', :name => 'requestMethod', :value => 'PATCH', :onclick => 'toggleRequestBodyDisplay(this, true);'}PATCH
+        %label
+          %input{:type => 'radio', :name => 'requestMethod', :value => 'DELETE', :onclick => 'toggleRequestBodyDisplay(this, false);'}DELETE
+        %label
+          %input{:type => 'radio', :name => 'requestMethod', :value => 'QUERY', :onclick => 'toggleRequestBodyDisplay(this, false);'}QUERY
+        %label
+          %input{:type => 'radio', :name => 'requestMethod', :value => 'SEARCH', :onclick => 'toggleRequestBodyDisplay(this, false);'}SEARCH
+        %input{:id => 'resetButton', :type => 'button', :value => 'Reset', :onclick => 'resetUrl();'}
+        %span{:id => 'waitingIndicator'}
+          %img{:src => 'images/wait16trans.gif'} Processing...
+        %p
+        %input{:id => 'urlInput', :name => 'urlInput', :value => '', :style => 'width: 35em; height: 1.2em; font-size: 18px; font-weight: bold;', :onKeyPress => "if (checkEnter(event)) {document.getElementById('execBtn').click(); return false;}"}
+        %input{:id => 'execBtn', :name => 'doExecute', :type => 'submit', :value => 'Execute', :style => 'font-size: 18px;'}
+        %div{:id => 'requestBodyContainer', :style => 'display: none;'}
+          %p
+            %strong Request Body
+            %textarea{:name => 'requestBody', :style => 'width: 100%; height: 10em; font-family: courier, monotype;'}
+      %div{:id => 'results', :style => 'float: left;'}

@@ -7,7 +7,7 @@ require 'stringio'
 require 'webmock/rspec'
 include WebMock::API
 
-def build_env(path=ShellForce.config.path, query={}, properties={})
+def build_env(path=ShellForce.config.auth_path, query={}, properties={})
   query_string = query.collect{|k,v| "#{k}=#{CGI.escape(v)}"}.join('&')
   {
     "PATH_INFO" => path,
@@ -28,14 +28,14 @@ describe ShellForce::OAuth2 do
     ShellForce.config.site = 'https://login.salesforce.com'
     ShellForce.config.host = 'https://localhost'
     ShellForce.config.port = 3000
-    ShellForce.config.path = '/shellforce/auth'
+    ShellForce.config.auth_path = '/shellforce/auth'
     ShellForce.config.client_id = 'client_id'
     ShellForce.config.client_secret = 'client_secret'
   end
   
 
   it "is initialized" do
-    @oauth2.full_path.should == [ShellForce.config.host, ShellForce.config.port].join(':') + ShellForce.config.path
+    @oauth2.full_path.should == [ShellForce.config.host, ShellForce.config.port].join(':') + ShellForce.config.auth_path
   end
 
 
@@ -49,7 +49,7 @@ describe ShellForce::OAuth2 do
     stub_request(:get, ShellForce.config.site + '/services/oauth2/authorize').
       with(:query => query).to_return(:status => 200)
 
-    response = @oauth2.call(build_env(ShellForce.config.path, query))
+    response = @oauth2.call(build_env(ShellForce.config.auth_path, query))
     response[0] == 200
   end
 
@@ -69,7 +69,7 @@ describe ShellForce::OAuth2 do
     stub_request(:post, ShellForce.config.site + '/services/oauth2/token').
       with(:query => query).to_return(:body => body)
 
-    response = @oauth2.call(build_env(ShellForce.config.path + '/callback', query))
+    response = @oauth2.call(build_env(ShellForce.config.auth_path + '/callback', query))
     response['shellforce.oauth2'].should == body
   end
 
@@ -92,7 +92,7 @@ describe ShellForce::OAuth2 do
     }
     
     begin
-      response = @oauth2.call(build_env(ShellForce.config.path + '/callback', query))
+      response = @oauth2.call(build_env(ShellForce.config.auth_path + '/callback', query))
     rescue StandardError => e
       e.error_code.should == error_code
     end

@@ -11,7 +11,7 @@ module ShellForce
     def initialize(app, options={})
       @app = app
       @options = options
-      @full_path = [ShellForce.config.host, ShellForce.config.port].join(':') + ShellForce.config.path
+      @full_path = [ShellForce.config.host, ShellForce.config.port].join(':') + ShellForce.config.auth_path
       @transport = ShellForce::Transport.new
     end
 
@@ -24,7 +24,7 @@ module ShellForce
     def call!(env)
       @request = Rack::Request.new(env)
       
-      if current_path == ShellForce.config.path
+      if current_path == ShellForce.config.auth_path
         query = {
           'response_type' => 'code',
           'client_id' => ShellForce.config.client_id,
@@ -33,7 +33,7 @@ module ShellForce
 
         redirect(@transport.build_uri(ShellForce.config.site + '/services/oauth2/authorize', query.merge!(@options)))
 
-      elsif current_path == ShellForce.config.path + '/callback'
+      elsif current_path == ShellForce.config.auth_path + '/callback'
         if @request.params['error']
           raise ShellForce::CallbackError.new(@request.params['error'], @request.params['error_description'])
         end

@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chiharu Kawatake"]
-  s.date = %q{2011-10-23}
+  s.date = %q{2011-10-29}
   s.description = %q{A simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
   s.email = %q{}
   s.executables = ["create_shellforce_config", "shellforce", "shellforce", "create_shellforce_config"]
@@ -35,10 +35,19 @@ Gem::Specification.new do |s|
     "lib/shellforce/config.ru",
     "lib/shellforce/exception.rb",
     "lib/shellforce/oauth2.rb",
+    "lib/shellforce/public/css/master.css",
+    "lib/shellforce/public/css/pro_dropdown.css",
+    "lib/shellforce/public/css/restexplorer.css",
+    "lib/shellforce/public/css/simpletree.css",
+    "lib/shellforce/public/js/pro_dropdown.js",
+    "lib/shellforce/public/js/restexplorer.js",
+    "lib/shellforce/public/js/simpletreemenu.js",
+    "lib/shellforce/public/js/wz_tooltip.js",
     "lib/shellforce/rest.rb",
     "lib/shellforce/server.rb",
     "lib/shellforce/transport.rb",
     "lib/shellforce/util.rb",
+    "lib/shellforce/views/index.haml",
     "spec/agent_spec.rb",
     "spec/agent_spec_helper.rb",
     "spec/client_spec.rb",
@@ -73,6 +82,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<rack>, [">= 1.3.4"])
       s.add_runtime_dependency(%q<sinatra>, [">= 1.3.1"])
       s.add_development_dependency(%q<nokogiri>, [">= 1.4.4"])
+      s.add_development_dependency(%q<haml>, [">= 3.1.3"])
       s.add_development_dependency(%q<webmock>, [">= 1.7.4"])
       s.add_development_dependency(%q<rspec>, [">= 2.6"])
     else
@@ -89,6 +99,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rack>, [">= 1.3.4"])
       s.add_dependency(%q<sinatra>, [">= 1.3.1"])
       s.add_dependency(%q<nokogiri>, [">= 1.4.4"])
+      s.add_dependency(%q<haml>, [">= 3.1.3"])
       s.add_dependency(%q<webmock>, [">= 1.7.4"])
       s.add_dependency(%q<rspec>, [">= 2.6"])
     end
@@ -106,6 +117,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<rack>, [">= 1.3.4"])
     s.add_dependency(%q<sinatra>, [">= 1.3.1"])
     s.add_dependency(%q<nokogiri>, [">= 1.4.4"])
+    s.add_dependency(%q<haml>, [">= 3.1.3"])
     s.add_dependency(%q<webmock>, [">= 1.7.4"])
     s.add_dependency(%q<rspec>, [">= 2.6"])
   end
