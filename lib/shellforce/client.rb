@@ -58,6 +58,16 @@ module ShellForce
     end
 
     
+    def id
+      @agent.id
+    end
+
+
+    def reload(config)
+      ShellForce.config.use(config)
+    end
+    
+    
     def to(type)
       if type == :apex
         @saved_path = @current_path.dup

@@ -91,6 +91,8 @@ require 'shellforce/config'
 ShellForce.configure :default do
   set :client_id => ''
   set :client_secret => ''
+  set :pp => true
+  set :postprocess => [lambda{|h,b| print b; return h,b}]
   set :logging => false 
 end
 CONFIG

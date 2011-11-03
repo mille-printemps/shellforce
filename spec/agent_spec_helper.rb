@@ -13,13 +13,15 @@ shared_context "agent_shared_context" do
     ShellForce.config.password = 'password'
 
     @agent = ShellForce::Agent.new    
-    
+
     @instance_url = 'https://na1.salesforce.com'
-    @organization_id = 'organization_id'    
+    @organization_id = 'organization_id'
+    @user_id = 'user_id'
     @issued_at = '123456789'
     @signature = 'signature'
     @token = 'token'
     @refresh_token = 'refresh_token'
+    @id = "https://login.salesforce.com/id/#{@organization_id}/#{@user_id}"
     @headers = {"Authorization" => "OAuth #{@token}"}
     
     @new_issued_at = '987654321'
@@ -30,7 +32,10 @@ shared_context "agent_shared_context" do
     @wrong_resource = '/wrong_resource'
 
     @accept = {"Accept" => "application/#{ShellForce.config.format}"}
-    @content_type = {"Content-Type" => "application/#{ShellForce.config.format}"}    
+    @content_type = {"Content-Type" => "application/#{ShellForce.config.format}"}
+    @pp = {"X-PrettyPrint" => "1"}
+
+    ShellForce.config.pp = true
   end
 
   
@@ -70,6 +75,8 @@ BODY
   def submit_query(resource, &block)
     body = '{"totalSize":0}'
     headers = @headers.merge(@accept)
+    headers.merge!(@pp) if ShellForce.config.pp == true
+    
     query = {'q' => 'a'}
 
     stub_request(:get, @instance_url + @resource + resource).
@@ -79,4 +86,3 @@ BODY
     response.body.should == body
   end
 end
-

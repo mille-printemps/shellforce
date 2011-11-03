@@ -8,6 +8,20 @@ include WebMock::API
 describe ShellForce::Agent do
   include_context "agent_shared_context"
 
+  it "can be intialized by arguments" do
+    args = {"signature" => "#{@signature}", "id" => "#{@id}", "instance_url" => "#{@instance_url}",\
+      "access_token" => "#{@organization_id}!#{@token}", "issued_at" => "#{@issued_at}"}
+    
+    agent = ShellForce::Agent.new(args)
+
+    agent.id.should == @id
+    agent.instance_url.should == @instance_url
+    agent.issued_at.should == @issued_at
+    agent.organization_id.should == @organization_id
+    agent.token.should == @token
+  end
+  
+  
   it "makes a log file when the log flag is set" do
     ShellForce.config.logging = true
     
@@ -60,6 +74,7 @@ BODY
 
     body = '{"totalSize":0}'
     headers = @headers.merge(@accept)
+    headers.merge!(@pp) if ShellForce.config.pp == true
 
     stub_request(:head, @instance_url + @resource).
       with(:headers => headers).to_return(:body => body)
@@ -74,7 +89,8 @@ BODY
 
     body = '{"totalSize":0}'
     headers = @headers.merge(@accept)
-
+    headers.merge!(@pp) if ShellForce.config.pp == true
+    
     stub_request(:get, @instance_url + @resource).
       with(:headers => headers).to_return(:body => body)
     
@@ -89,6 +105,8 @@ BODY
     body = '{"totalSize":0}'
     headers = @headers.merge(@accept)
     headers.merge!(@content_type)
+    headers.merge!(@pp) if ShellForce.config.pp == true
+    
     request = '{"name" => "name"}'
     
     stub_request(:post, @instance_url + @resource).
@@ -105,6 +123,8 @@ BODY
     body = '{"totalSize":0}'
     headers = @headers.merge(@accept)
     headers.merge!("Content-Type" => "application/x-www-form-urlencoded")
+    headers.merge!(@pp) if ShellForce.config.pp == true
+    
     query = {"a" => "b", "c" => "d"}
 
     stub_request(:post, @instance_url + @resource).
@@ -131,6 +151,7 @@ BODY
 
     body = ''
     headers = @headers.merge(@accept)
+    headers.merge!(@pp) if ShellForce.config.pp == true    
     
     stub_request(:delete, @instance_url + @resource).
       with(:headers => headers).to_return(:body => body)
@@ -146,6 +167,8 @@ BODY
     body = '{"totalSize":0}'
     headers = @headers.merge(@accept)
     headers.merge!(@content_type)
+    headers.merge!(@pp) if ShellForce.config.pp == true
+    
     request = '{"name" => "name"}'
 
     stub_request(:patch, @instance_url + @resource).

@@ -12,12 +12,15 @@ module ShellForce
     def initialize(args={})
       @transport = ShellForce::Transport.new
 
+      @id = args['id']
       @instance_url = args['instance_url']
       @issued_at = args['issued_at']
       @signature = args['signature']
       @refresh_token = args['refresh_token']
       @organization_id, @token = (args['access_token'] ? args['access_token'].split('!') : [nil, nil])
-      @headers = {"Authorization" => "OAuth #{@token}"} if @token
+      @headers = (@token ? {"Authorization" => "OAuth #{@token}"} : {})
+
+      @@pp = {'X-PrettyPrint' => '1'}
 
       if ShellForce.config.logging
         require 'logger'
@@ -84,7 +87,7 @@ module ShellForce
     def head(resource, format=ShellForce.config.format)
       request do
         headers = @headers.merge(set_format("Accept", format))
-        @transport.head(@instance_url + resource, headers)
+        @transport.head(@instance_url + resource, ppify(headers))
       end
     end
 
@@ -92,7 +95,7 @@ module ShellForce
     def get(resource, format=ShellForce.config.format)
       request do
         headers = @headers.merge(set_format("Accept", format))
-        @transport.get(@instance_url + resource, '', headers)
+        @transport.get(@instance_url + resource, '', ppify(headers))
       end
     end
 
@@ -109,7 +112,7 @@ module ShellForce
           raise ArgumentError.new("data must be a string or a hash")
         end
         
-        @transport.post(@instance_url + resource, data, headers)
+        @transport.post(@instance_url + resource, data, ppify(headers))
       end
     end
 
@@ -117,7 +120,7 @@ module ShellForce
     def delete(resource, format=ShellForce.config.format)
       request do
         headers = @headers.merge(set_format("Accept", format))
-        @transport.delete(@instance_url + resource, headers)
+        @transport.delete(@instance_url + resource, ppify(headers))
       end
     end
 
@@ -126,7 +129,7 @@ module ShellForce
       request do
         headers = @headers.merge(set_format("Accept", format))
         headers.merge!(set_format("Content-Type", format))
-        @transport.patch(@instance_url + resource, data, headers)
+        @transport.patch(@instance_url + resource, data, ppify(headers))
       end
     end
 
@@ -140,7 +143,7 @@ module ShellForce
       submit_query(resource + '/search', query, format)
     end
     
-    attr_reader :instance_url, :issued_at, :organization_id, :token, :headers, :user_name
+    attr_reader :id, :instance_url, :issued_at, :organization_id, :token, :headers, :user_name
 
     
     private
@@ -167,10 +170,15 @@ module ShellForce
     end
 
     
+    def ppify(headers)
+      headers.merge!(@@pp) if ShellForce.config.pp == true
+    end
+
+    
     def submit_query(resource, query, format)
       request do
         headers = @headers.merge(set_format("Accept", format))
-        @transport.get(@instance_url + resource, {'q' => query}, headers)
+        @transport.get(@instance_url + resource, {'q' => query}, ppify(headers))
       end
     end
     

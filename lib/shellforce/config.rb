@@ -35,7 +35,7 @@ module ShellForce
     :server_logger, :server_access_logger, \
     :path, :auth_path, :rack_config, \
     :home, :site, :client_id, :client_secret, \
-    :user_name, :password, :user_agent, :format, :logging, \
+    :user_name, :password, :user_agent, :format, :pp, :logging, \
     :preprocess, :postprocess
   end
 
@@ -81,6 +81,7 @@ ShellForce.configure :default do
   set :password => nil
   set :user_agent => 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2) Gecko/20100115 Firefox/3.6'
   set :format => :json
+  set :pp => true
   set :logging => false
   set :preprocess => [lambda{|*args| return args}]
   set :postprocess => [lambda{|headers, body| return headers, body}]
