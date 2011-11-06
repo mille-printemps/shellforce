@@ -29,7 +29,8 @@ module ShellForce
       
       response = @agent.get("/services/data")
       @current_path = JSON.parse(response.body).collect {|u| u["url"]}.sort[-1]
-      @saved_path = ""
+      @data_path = @current_path.dup
+      @@apex_path = '/services/apexrest'
     end
 
     
@@ -62,6 +63,11 @@ module ShellForce
       @agent.id
     end
 
+    
+    def current_path=(path)
+      @current_path = path if /\/services\/data\/v\d+\.\d+/ =~ path || /\/services\/apexrest/ =~ path || path == '/'
+    end
+    
 
     def reload(config)
       ShellForce.config.use(config)
@@ -69,11 +75,21 @@ module ShellForce
     
     
     def to(type)
-      if type == :apex
-        @saved_path = @current_path.dup
-        @current_path.gsub!(/\/services\/data\/v\d\d\.0/, '/services/apexrest')
-      elsif type == :data
-        @current_path.gsub!(/\/services\/apexrest/, @saved_path)
+      case type
+      when :apex
+        if @current_path == '/'
+          @current_path = @@apex_path
+        else
+          @current_path.gsub!(/\/services\/data\/v\d+\.\d+/, @@apex_path)
+        end
+      when :data
+        if @current_path == '/'
+          @current_path = @data_path
+        else
+          @current_path.gsub!(/\/services\/apexrest/, @data_path)
+        end
+      when :root
+        @current_path = '/'
       else
         "#{type} is not supported"
       end

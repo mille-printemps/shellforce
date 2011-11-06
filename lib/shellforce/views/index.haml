@@ -10,6 +10,7 @@
     %link{:rel => 'stylesheet', :href => "css/simpletree.css", :type => 'text/css'}
       :javascript
         var shellforce_api = "#{shellforce_api}"
+        var shellforce_current_path = "#{shellforce_current_path}"
     %script{:type => 'text/javascript', :src => "js/jquery-1.6.4.min.js"}
     %script{:type => 'text/javascript', :src => "js/pro_dropdown.js"}
     %script{:type => 'text/javascript', :src => "js/simpletreemenu.js"}
@@ -22,7 +23,7 @@
         %tr
           %td{:id => 'pageTitle'}
             ShellForce REST Explorer - a clone of REST Explorer in |
-            %a{:href => url('https://workbench.developerforce.com/login.php')} Workbench
+            %a{:href => url('https://workbench.developerforce.com/about.php')} Workbench
       %div
         %label
           %input{:type => 'radio', :name => 'requestMethod', :value => 'GET', :checked => 'checked', :onclick=> 'toggleRequestBodyDisplay(this, false);'}GET
@@ -39,6 +40,10 @@
         %input{:id => 'resetButton', :type => 'button', :value => 'Reset', :onclick => 'resetUrl();'}
         %span{:id => 'waitingNotice', :style => 'display: none;'}
           %img{:src => 'images/wait16trans.gif'} Processing...
+        %p
+          %div
+            %span{:style => 'height: 1.2em; font-size: 18px;'} Path (click on the text to change):
+            %span{:name => 'path', :style => 'height: 1.2em; font-size: 18px; font-weight: bold;'}
         %p
         %input{:id => 'urlInput', :name => 'urlInput', :value => '', :style => 'width: 35em; height: 1.2em; font-size: 18px; font-weight: bold;', :onKeyPress => "if (checkEnter(event)) {document.getElementById('execBtn').click(); return false;}"}
         %input{:id => 'execBtn', :name => 'doExecute', :type => 'submit', :value => 'Execute', :style => 'font-size: 18px;'}

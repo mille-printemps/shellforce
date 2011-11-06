@@ -31,6 +31,14 @@ module ShellForce
       Configuration.instance[name].each_pair {|k ,v| self.send("#{k}=", v)}
     end
 
+    
+    def copy(from, to)
+      Configuration.instance[from].each_pair{|k, v|
+        Configuration.instance[to][k] = (v != nil && (v.is_a?(String) || v.is_a?(Array) || v.is_a?(Hash))) ? v.dup : v
+      }
+    end
+    
+
     attr_accessor :host, :port, :document_root, :private_key, :cert, \
     :server_logger, :server_access_logger, \
     :path, :auth_path, :rack_config, \

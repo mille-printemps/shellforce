@@ -22,11 +22,11 @@ configuration = {
 :AccessLog => ShellForce.config.server_access_logger
 }
 
+
 application = Rack::Session::Cookie.new(
   ShellForce::OAuth2.new(
-    ShellForce::Application.new
+    Sinatra::Application.new
   )
 )
 
 Rack::Handler::WEBrick.run application, configuration
-

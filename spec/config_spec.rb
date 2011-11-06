@@ -47,6 +47,18 @@ describe ShellForce::Configuration do
     ShellForce.config.client_id.should == new_client_id
     ShellForce.config.client_secret.should == new_client_secret
   end
+
+  
+  it "copies one to another" do
+
+    ShellForce.config.copy(:default, :another)
+    ShellForce.config[:default].each_pair{|k ,v|
+      v.should == ShellForce.config[:another][k]
+      v.should_not equal(ShellForce.config[:another][k]) if v != nil && (v.is_a?(String) || v.is_a?(Array) || v.is_a?(Hash))
+    }
+    
+  end
+  
   
 end
 
