@@ -10,10 +10,6 @@ include ShellForce::Util
 module ShellForce
   module Command
 
-    def xsl
-      @xsl ||= Nokogiri::XSLT(XSLT)
-    end
-    
     def pp(headers, body)
       format = headers["content-type"][0]
       if format.match("json")
@@ -25,6 +21,12 @@ module ShellForce
       end
       return headers, body
     end
+
+    
+    def xsl
+      @xsl ||= Nokogiri::XSLT(XSLT)
+    end
+    
 
     XSLT = <<-XSLT
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">

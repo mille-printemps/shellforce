@@ -25,7 +25,7 @@ def #{m}(*args)
     puts $!
   end
 end
-    METHOD
+METHOD
 end
 
 require 'irb'

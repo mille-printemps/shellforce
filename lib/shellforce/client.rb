@@ -63,11 +63,6 @@ module ShellForce
       @agent.id
     end
 
-    
-    def current_path=(path)
-      @current_path = path if /\/services\/data\/v\d+\.\d+/ =~ path || /\/services\/apexrest/ =~ path || path == '/'
-    end
-    
 
     def reload(config)
       ShellForce.config.use(config)
@@ -77,19 +72,19 @@ module ShellForce
     def to(type)
       case type
       when :apex
-        if @current_path == '/'
+        if @current_path == ''
           @current_path = @@apex_path
         else
           @current_path.gsub!(/\/services\/data\/v\d+\.\d+/, @@apex_path)
         end
       when :data
-        if @current_path == '/'
+        if @current_path == ''
           @current_path = @data_path
         else
           @current_path.gsub!(/\/services\/apexrest/, @data_path)
         end
       when :root
-        @current_path = '/'
+        @current_path = ''
       else
         "#{type} is not supported"
       end

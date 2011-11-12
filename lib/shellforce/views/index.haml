@@ -12,12 +12,10 @@
         var shellforce_api = "#{shellforce_api}"
         var shellforce_current_path = "#{shellforce_current_path}"
     %script{:type => 'text/javascript', :src => "js/jquery-1.6.4.min.js"}
-    %script{:type => 'text/javascript', :src => "js/pro_dropdown.js"}
     %script{:type => 'text/javascript', :src => "js/simpletreemenu.js"}
     %script{:type => 'text/javascript', :src => "js/restexplorer.js"}
     %script{:type => 'text/javascript', :src => "js/shellforce.js"}
   %body
-    %script{:type => 'text/javascript', :src => "js/wz_tooltip.js"}    
     %div{:id => 'mainBlock'}
       %table{:width => '100%', :border => '0'}
         %tr
@@ -45,11 +43,13 @@
             %span{:style => 'height: 1.2em; font-size: 18px;'} Path (click on the text to change):
             %span{:name => 'path', :style => 'height: 1.2em; font-size: 18px; font-weight: bold;'}
         %p
-        %input{:id => 'urlInput', :name => 'urlInput', :value => '', :style => 'width: 35em; height: 1.2em; font-size: 18px; font-weight: bold;', :onKeyPress => "if (checkEnter(event)) {document.getElementById('execBtn').click(); return false;}"}
-        %input{:id => 'execBtn', :name => 'doExecute', :type => 'submit', :value => 'Execute', :style => 'font-size: 18px;'}
+        %input{:id => 'urlInput', :name => 'urlInput', :value => '', :style => 'width: 35em; height: 1.2em; font-size: 18px; font-weight: bold;', :onKeyPress => "if (checkEnter(event)) {document.getElementById('executeButton').click(); return false;}"}
+        %input{:id => 'executeButton', :name => 'execute', :type => 'submit', :value => 'Execute', :style => 'font-size: 18px;'}
         %div{:id => 'requestBodyContainer', :style => 'display: none;'}
           %p
             %strong Request Body
             %textarea{:name => 'requestBody', :style => 'width: 100%; height: 10em; font-family: courier, monotype;'}
       %div{:id => 'results', :style => 'float: left;'}
       %div{:id => 'codeViewPortContainer', :style => 'display: none; right: 10px;'}
+      %div{:id => 'disclaimer'}
+

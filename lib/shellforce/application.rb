@@ -29,17 +29,17 @@ end
 
 post "#{shellforce_api}" do
   # parse parameters
+  path = params[:path]
   method = params[:method]
   url = params[:url]
   body = params[:body]
 
   # depending on the parameters, call
+  set_current_path(path)
   response = case method
              when 'GET'
-               # TODO : if url starts with '/id', then change the current path
                @@client.get(url)
              when 'POST'
-               # TODO : make sure if the current path is correct
                @@client.post(url, body)
              when 'PATCH'
                @@client.patch(url, body)
@@ -50,24 +50,38 @@ post "#{shellforce_api}" do
              when 'SEARCH'
                @@client.search(url)
              else
-               '{"error" : "Illegal method : #{method}"}'
+               "{\"error\" : \"Illegal method : #{method}\"}"
              end
   if response.is_a?(Array) && response.length == 2
-    # TODO : make a json string with the body and the elapsed time
-    response[0]
+    "{\"raw\" : #{response[0]}, \"clickable\" : #{make_link_clickable(response[0])}, \"time\" : \"#{response[1]}\"}"
   else
-    '{"error" : "Illegal response : #{response}"}'
+    "{\"error\" : \"Illegal response : #{response}\"}"
   end
 end
 
 
 # Utility functions
 def make_link_clickable(body)
-  clickableBody = body.gsub(/(\/services\/data\/v\d+\.\d+)(\/sobjects\/[^\"]*)/){ |match|
-    match = '<a href=' + sprintf("\'javascript:getSObjectRecord(\"%s%s\")\'", $1, $2) + '>' + match + '</a>'
+  body = body.gsub(/(\/services\/data\/v\d+\.\d+\/[^\"]*)/){ |match|
+    match = '<a href=\'javascript:void(0);\' onclick=' + sprintf("\'getSObjectRecord(\\\"%s\\\");\'", $1) + '>' + match + '</a>'
   }
 
-  clickableBody.gsub!(/(https:\/\/login.salesforce.com)(\/id\/[^\"]*)/){ |match|
-    match = '<a href=' + sprintf("\'javascript:getSObjectRecord(\"%s\")\'", $2) + '>' + $2 + '</a>'
+  body = body.gsub(/(https:\/\/login.salesforce.com)(\/id\/[^\"]*)/){ |match|
+    match = '<a href=\'javascript:void(0);\' onclick=' + sprintf("\'getSObjectRecord(\\\"%s\\\");\'", $2) + '>' + $2 + '</a>'
   }
+
+  body
+end
+
+
+def set_current_path(path)
+  if /\/services\/data\/v\d+\.\d+/ =~ path
+    @@client.to(:data)
+  elsif /\/services\/apexrest/ =~ path
+    @@client.to(:apex)
+  elsif path == ''
+    @@client.to(:root)
+  else
+    @@client.to(:root)
+  end
 end
