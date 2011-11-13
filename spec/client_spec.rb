@@ -43,19 +43,5 @@ BODY
     @client.to(:root).should == ''    
     @client.to(:none).should == 'none is not supported'
   end
-
-
-  it "replaces the current path" do
-    data_path = '/services/data/v20.0'
-    wrong_path = '/services'    
-    correct_paths = [data_path, '/services/apexrest', '']
-    
-    correct_paths.each{|path| @client.current_path = path; @client.current_path.should == path}
-    
-    @client.current_path = data_path
-    @client.current_path = wrong_path
-    @client.current_path.should == data_path
-  end
-  
   
 end

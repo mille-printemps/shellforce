@@ -63,11 +63,6 @@ module ShellForce
       @agent.id
     end
 
-
-    def reload(config)
-      ShellForce.config.use(config)
-    end
-    
     
     def to(type)
       case type
