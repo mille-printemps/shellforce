@@ -28,35 +28,40 @@ get ShellForce.config.path do
 end
 
 post "#{shellforce_api}" do
-  # parse parameters
+  # Parse parameters
   path = params[:path]
   method = params[:method]
   url = params[:url]
   body = params[:body]
 
-  # depending on the parameters, call
-  set_current_path(path)
-  response = case method
-             when 'GET'
-               @@client.get(url)
-             when 'POST'
-               @@client.post(url, body)
-             when 'PATCH'
-               @@client.patch(url, body)
-             when 'DELETE'
-               @@client.delete(url)
-             when 'QUERY'
-               @@client.query(url)
-             when 'SEARCH'
-               @@client.search(url)
-             else
-               "{\"error\" : \"Illegal method : #{method}\"}"
-             end
-  if response.is_a?(Array) && response.length == 2
-    "{\"raw\" : #{response[0]}, \"clickable\" : #{make_link_clickable(response[0])}, \"time\" : \"#{response[1]}\"}"
-  else
-    "{\"error\" : \"Illegal response : #{response}\"}"
+  # Depending on the method, call the REST APIs
+  begin
+    set_current_path(path)
+    response = case method
+               when 'GET'
+                 @@client.get(url)
+               when 'POST'
+                 @@client.post(url, body)
+               when 'PATCH'
+                 @@client.patch(url, body)
+               when 'DELETE'
+                 @@client.delete(url)
+               when 'QUERY'
+                 @@client.query(url)
+               when 'SEARCH'
+                 @@client.search(url)
+               else
+                 "{\"error\" : \"Illegal method : #{method}\"}"
+               end
+    if response.is_a?(Array) && response.length == 2
+      "{\"raw\" : #{response[0]}, \"clickable\" : #{make_link_clickable(response[0])}, \"time\" : \"#{response[1]}\"}"
+    else
+      "{\"error\" : \"Illegal response : #{response}\"}"
+    end
+  rescue => e
+      "{\"error\" : \"#{e.message}\"}"
   end
+  
 end
 
 

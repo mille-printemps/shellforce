@@ -20,7 +20,8 @@
           %td{:id => 'pageTitle'}
             ShellForce REST Explorer - a clone of REST Explorer in |
             %a{:href => url('https://workbench.developerforce.com/about.php')} Workbench
-      %div
+      %div{:class => 'displayErrors'}
+      %div{:id => 'subBlock'}
         %label
           %input{:type => 'radio', :name => 'requestMethod', :value => 'GET', :checked => 'checked'}GET
         %label
