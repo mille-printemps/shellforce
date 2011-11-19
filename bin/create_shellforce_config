@@ -1,9 +1,0 @@
-#!/usr/bin/env ruby
-# coding : utf-8
-
-$:.unshift File.dirname(__FILE__) + "/../lib"
-
-require 'shellforce/util'
-include ShellForce::Util
-
-create_config
