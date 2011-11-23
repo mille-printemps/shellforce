@@ -12,6 +12,10 @@ module ShellForce
 
     
     def start
+      trap(:INT) do
+        stop
+      end
+      
       super.start
     end
 

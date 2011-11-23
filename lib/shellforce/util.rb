@@ -11,59 +11,59 @@ module ShellForce
     LOCAL_CONFIG = 'local_config.rb'
 
     def create_config
-      display 'Please give information for creating a self-signed certificate.'
+      display "Please enter information for creating a self-signed certificate."
 
-      display 'Country Name (2 letter code) [JP]: ', false
+      display "Country Name (2 letter code) [JP]: ", false
       country = ask
-      country = "JP" if country == "\n"
+      country = "JP" if country == ""
         
       if country.size != 2
-        display 'The country name needs to be #{COUNTRY_NAME_MAX} bytes long.'
+        display "The country name needs to be #{COUNTRY_NAME_MAX} bytes long."
         exit!
       end
       
-      display 'State or Province Name (full name) [Tokyo]: ', false
+      display "State or Province Name (full name) [Tokyo]: ", false
       state = ask
-      state = "Tokyo" if state == "\n"
+      state = "Tokyo" if state == ""
 
       if OTHER_NAME_MAX < state.size
-        display 'The state or province name needs to be #{OTHER_NAME_MAX} bytes long.'
+        display "The state or province name needs to be #{OTHER_NAME_MAX} bytes long."
         exit!
       end
       
-      display 'Locality Name (e.g. city) [Tokyo]: ', false
+      display "Locality Name (e.g. city) [Tokyo]: ", false
       locality = ask
-      locality "Tokyo" if locality == "\n"
+      locality = "Tokyo" if locality == ""
 
       if OTHER_NAME_MAX < locality.size
-        display 'The locality name needs to be #{OTHER_NAME_MAX} bytes long.'
+        display "The locality name needs to be #{OTHER_NAME_MAX} bytes long."
         exit!
       end
       
-      display 'Organization Name (e.g. company) [salesforce.com]: ', false
+      display "Organization Name (e.g. company) [salesforce.com]: ", false
       organization = ask
-      organization = "salesforce.com" if organization == "\n"
+      organization = "salesforce.com" if organization == ""
 
       if OTHER_NAME_MAX < organization.size
-        display 'The organization name needs to be #{OTHER_NAME_MAX} bytes long.'
+        display "The organization name needs to be #{OTHER_NAME_MAX} bytes long."
         exit!
       end
       
-      display 'Organizaitonal Unit Name (e.g. section) [salesforce.com Japan]: ', false
+      display "Organizaitonal Unit Name (e.g. section) [salesforce.com Japan]: ", false
       unit = ask
-      unit = "salesforce.com Japan" if unit == "\n"
+      unit = "salesforce.com Japan" if unit == ""
 
       if OTHER_NAME_MAX < unit.size
-        display 'The organizational unit name needs to be #{OTHER_NAME_MAX} bytes long.'
+        display "The organizational unit name needs to be #{OTHER_NAME_MAX} bytes long."
         exit!
       end
       
-      display 'Common Name (e.g. your name) []: ', false
+      display "Common Name (e.g. your name) []: ", false
       name = ask
-      name = "" if name == "\n"
+      name = "" if name == ""
 
       if OTHER_NAME_MAX < name.size
-        display 'The organizational unit name needs to be #{OTHER_NAME_MAX} bytes long.'
+        display "The organizational unit name needs to be #{OTHER_NAME_MAX} bytes long."
         exit!
       end
 
@@ -75,6 +75,7 @@ module ShellForce
       create_local_config(ShellForce.home, LOCAL_CONFIG)
       create_cert(subject_info, ShellForce.config.private_key, ShellForce.config.cert)
 
+      display("Configuring...")
       display("#{LOCAL_CONFIG} is created under #{ShellForce.config.home}")
     end
 
@@ -119,8 +120,8 @@ CONFIG
       subject_info.each {|k,v| subject.add_entry(k, v)}
 
       cert_body = OpenSSL::X509::Certificate.new
-      cert_body.not_before = Time.at(0)
-      cert_body.not_after = Time.at(0)
+      cert_body.not_before = Time.now
+      cert_body.not_after = Time.local(2037, 12, 31, 23, 59, 59)
       cert_body.public_key = key
       cert_body.serial = 1
       cert_body.issuer = issuer
@@ -197,7 +198,7 @@ CONFIG
     
     
     def ask_for_credentials
-      puts "Enter Salesforce credentials."
+      puts "Enter your Salesforce.com credentials."
 
       print "User name: "
       user_name = ask

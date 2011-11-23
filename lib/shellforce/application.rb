@@ -12,10 +12,13 @@ def shellforce_api
   ShellForce.config.path + '/api'
 end
 
+
 def shellforce_current_path
   @@client.current_path
 end
 
+
+@@client = nil
 
 # Request handlers
 get ShellForce.config.auth_path + '/callback' do
@@ -23,9 +26,12 @@ get ShellForce.config.auth_path + '/callback' do
   redirect ShellForce.config.path
 end
 
+
 get ShellForce.config.path do
+  redirect ShellForce.config.auth_path unless @@client
   haml :index
 end
+
 
 post "#{shellforce_api}" do
   # Parse parameters

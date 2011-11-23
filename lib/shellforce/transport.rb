@@ -95,8 +95,8 @@ module ShellForce
 
 
     def connect(uri)
-      connection = @connection_cache["#{uri.host}:#{uri.port}"] ||= {}
-      connection[:object] ||= Net::HTTP.new(uri.host, uri.port).tap {|h| h.use_ssl = true if uri.is_a?(URI::HTTPS)}
+      connection = (@connection_cache["#{uri.host}:#{uri.port}"] ||= {:object => nil, :last_request_time => nil})
+      connection[:object] = net_http(uri) if connection[:object].nil? || !connection[:object].started?
       
       if connection[:last_request_time] && @keep_alive_time < Time.now.to_i - connection[:last_request_time]
         connection[:object].finish
@@ -107,12 +107,15 @@ module ShellForce
     end
 
     
-=begin 
     def net_http(uri)
-      @connection_cache["#{uri.host}:#{uri.port}"] ||=
-        Net::HTTP.new(uri.host, uri.port).tap {|h| h.use_ssl = true if uri.is_a?(URI::HTTPS)}
+      Net::HTTP.new(uri.host, uri.port).tap {|h|
+        if uri.is_a?(URI::HTTPS)
+          h.use_ssl = true
+          h.verify_mode = OpenSSL::SSL::VERIFY_NONE          
+        end
+      }
     end
-=end
+
     
     def request(method, uri, headers)
       Net::HTTP.const_get(method.to_s.capitalize).new(uri.request_uri, headers)
@@ -137,11 +140,6 @@ module ShellForce
         connection.request(request(method, uri, headers), data.is_a?(String) ? data : '')
       end
       
-=begin
-      connection = net_http(uri)
-      connection.start unless connection.started?
-      response = connection.request(request(method, uri, headers), data.is_a?(String) ? data : '')
-=end
       log_response(response) if log
       
       if Net::HTTPResponse::CODE_TO_OBJ[response.code.to_s] <= Net::HTTPRedirection

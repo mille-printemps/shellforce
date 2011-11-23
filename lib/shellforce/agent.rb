@@ -171,7 +171,7 @@ module ShellForce
 
     
     def ppify(headers)
-      headers.merge!(@@pp) if ShellForce.config.pp == true
+      ShellForce.config.pp == true ? headers.merge!(@@pp) : headers
     end
 
     

@@ -9,11 +9,17 @@ def client
   @client ||= ShellForce::Client.new
 end
 
+config_name = ARGV.empty? ? "default" : ARGV[0]
+ARGV.clear
+
+# Overwrite the default configuration
+ShellForce.config.use config_name.to_sym
+
 puts "Initializing..."
 client
 
-config = ARGV.empty? ? :default : ARGV[0]
-ShellForce.config.use config
+# Overwrite the default configuration again
+ShellForce.config.use config_name.to_sym
 
 CLIENT = client.methods.sort - client.class.superclass.methods
 CLIENT.each do |m|
@@ -35,8 +41,6 @@ irbrc = File.join(ENV["HOME"], ".irbrc")
 if File.exists? irbrc
     ENV["IRBRC"] = irbrc
 end
-
-ARGV.clear
 
 IRB.start
 

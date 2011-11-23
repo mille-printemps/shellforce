@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+# coding : utf-8
+
+$:.unshift File.dirname(__FILE__) + "/../lib"
+
+require 'shellforce/config'
+require 'shellforce/server'
+
+config_name = ARGV.empty? ? "default" : ARGV[0]
+ARGV.clear
+ShellForce.config.copy(:default, config_name.to_sym)
+ShellForce.config.use config_name.to_sym
+
+ShellForce::Server.new.start
+

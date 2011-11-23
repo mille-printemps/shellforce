@@ -1,19 +1,156 @@
-= shellforce
+= shellforce -- simple wrapper of Salesforce.com REST API
 
-Description goes here.
+A simple wrapper of Salesforce.com REST API, inspired by Rest Client developed by Adam Wiggins and Julien Kirch. 
 
-== Contributing to shellforce
- 
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
-* Fork the project
-* Start a feature/bugfix branch
-* Commit and push until you are happy with your contribution
-* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
-* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+* Main page: http://github.com/mille-printemps/shellforce
 
-== Copyright
+== Configuration
 
-Copyright (c) 2011 Chiharu Kawatake. See LICENSE.txt for
-further details.
+Execute `shellforce_config` first. This will ask you to enter information necessary to create a self-signed certificate. The certificate is used for `shellforce_server` mentioned later. 
+
+  %> shellforce_config
+  Please enter information for creating a self-signed certificate.
+  Country Name (2 letter code) [JP]:
+
+A file named 'local_config.rb' will be created on ENV["HOME"]/.shellforce. Set `client_id` and `client_secret` of your Salesforce.com organization. 
+
+  require 'shellforce/config'
+
+  ShellForce.configure :default do
+    set :client_id => ''
+    set :client_secret => ''
+    set :pp => true
+    set :postprocess => [lambda{|h,b| print b; return h,b}]
+    set :logging => false 
+  end
+
+== Shell
+
+Execute `shellforce`. This will ask you to input your credentials of your Salesforce.com organization.
+
+  %> shellforce
+  Initializing...
+  Enter your Salesforce.com credentials.
+  User name: 
+
+If the credetials are valid, a command prompt will be shown. (the form of the command prompt may vary depending on your IRB setting.)
+
+== Examples
+
+By default, the shell sets the root resource path to <URL of your Salesforce.com organization> + '/services/data' + <the latest API version>, e.g. 'https://na7.salesforce.com/services/data/v23.0'. Specify the rest of the resource path to `get`, `post`, `patch` and `delete`. For SOQL and SOSL queries, just specify a query string after `query` or `search`, respectively. 
+
+  >> get '/sobjects/account'
+  >> post '/sobjects/account', '{"name" : "foo"}'
+  >> patch '/sobjects/account/001A000000nhLV6IAN', '{"BillingCity" : "Tokyo"}'  # The ID is different in your Salesforce.com organization
+  >> delete '/sobjects/account/001A000000nhLV6IAN'
+  >> query 'select name from account'
+  >> search 'find {"bar"}'
+
+  >> post '/chatter/feeds/news/me/feed-items', '{"body" : {"messageSegments": [{"type": "Text", "text":"hoge"}]}}'
+  >> post '/chatter/feeds/news/me/feed-items', {"text" => "hoge"}   # A Ruby style hash can be specified instead of message segments like above
+  >> post '/chatter/feed-items/0D5A000000YeellKAC/comments', '{"body" : {"messageSegments": [{"type": "Text", "text":"fuga"}]}}'
+  >> post '/chatter/feed-items/0D5A000000YeellKAC/comments', {"text" => "fuga"}
+  >> post '/chatter/feed-items/0D5A000000YeellKAB/likes', ''  # The second argument is an empty string
+
+== Using other resource paths
+
+`to` command will allow you to change the root resource path.
+
+  >> to :root
+  >> ""  # The root resource path is set to 'https://na7.salesforce/' if your Salesforce.com organization is hosted at na7.salesforce.com
+  >> get '/services/data'
+  
+  >> to :data
+  >> "/services/data/v23.0"  # The root resource path is set to 'https://na7.salesforce.com/services/data/v23.0'
+
+For Apex REST, execute 'to :apex'. 
+
+  >> to :apex
+  >> "/services/apexrest"  # Your own Apex REST serivice has to be implemented beforehand
+
+  
+== Using multiple configurations
+
+Just add more configurations to your local_config.rb if necessary. Specify the name of the configuration to `shellforce`. Your local_config.rb may look like
+
+  require 'shellforce/config'
+
+  ShellForce.configure :default do
+    set :client_id => ''
+    set :client_secret => ''
+    set :pp => true
+    set :postprocess => [lambda{|h,b| print b; return h,b}]
+    set :logging => false 
+  end
+
+  
+  ShellForce.configure :another do
+    set :client_id => 'client id of another Salesforce.com organization goes here'
+    set :client_secret => 'client secret of another Salesforce.com organization goes here'
+    set :pp => false
+    set :postprocess => [lambda{|h,b| print b; return h,b}]
+    set :logging => true
+  end
+
+  %> shellforce another
+
+== Tweaking the response
+
+A response of a REST API request can be tweaked by implementing plug-ins. A plug-in has to accept two arguments, response header and response body, and have a method named `call` with no arguments. For example, the following plug-in just prints a response body.
+
+  lambda{|h, b| print b; return h,b}  # h contains response headers and b contains a response body
+  
+== Logging
+
+In a configuration, set `logging` to true. A file named `log.txt` will be created on ENV["HOME"]/.shellforce.
+
+== Miscellaneous
+
+If you do not want to enter your credential information when you execute `shellforce`, set `user_name` and `password` in your configuration.
+
+  ShellForce.configure :default do
+    set :client_id => ''
+    set :client_secret => ''
+    set :user_name => 'your user name goes here'
+    set :password => 'your password goes here'
+    set :pp => true
+    set :postprocess => [lambda{|h,b| print b; return h,b}]
+    set :logging => false 
+  end
+
+  %> shellforce
+  Initializing...
+  >>
+
+Some pieces of information are obtained from the command line
+
+  >> instance_url  # The instance URL that your Salesforce.com organization is hosted
+  >> organization_id  # The ID of your Salesforce.com organization
+  >> user_name  # Your user name
+  >> token  # OAuth token
+
+Multi-byte characters can be used in the command line without escaping them (Your terminal application has to support UTF-8.)
+
+  >> query "select name from account where name = '山田 花子'"
+  >> post '/chatter/feeds/news/me/feed-items', {"text" => "日本語も大丈夫"}  
+  
+== Usage: REST Explorer clone
+
+As an applicaiton of shellforce, a clone of REST Explorer, part of Workbench (https://workbench.developerforce.com/login.php) is available. Install some gems first before using it.
+
+  %> gem install sinatra
+  %> gem install haml
+  %> shellforce_server
+
+Access 'https://localhost:3000/shellforce' with your web browser. Enter your credential informaiton if necessary. 
+
+== Meta
+
+Written by Chiharu Kawatake
+
+Released under the MIT License: http://www.opensource.org/licenses/mit-license.php
+
+shellforce is NOT a supported product of or supported by salesforce.com, inc.
+
+This application is provided 'AS IS' and the user assumes all risks associated with its use. 
 

@@ -71,8 +71,7 @@ ShellForce.configure :default do
   set :document_root => ShellForce.home
   set :private_key => File.join(ShellForce.home, 'key.pem')
   set :cert => File.join(ShellForce.home, 'cert.pem')
-  set :server_logger => WEBrick::Log::new($stderr, WEBrick::Log::DEBUG)
-#  set :server_logger => WEBrick::Log::new($stderr, WEBrick::Log::FATAL)  
+  set :server_logger => WEBrick::Log::new($stderr, WEBrick::Log::FATAL)  
   set :server_access_logger => []
   
   # OAuth2 configuration

@@ -1,5 +1,7 @@
 # coding : utf-8
 
+# This is experimental. Not tested yet. 
+
 require 'rubygems'
 require 'json'
 require 'nokogiri'
