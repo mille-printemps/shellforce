@@ -5,14 +5,14 @@
 
 Gem::Specification.new do |s|
   s.name = %q{shellforce}
-  s.version = "1.0.0"
+  s.version = "0.9.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chiharu Kawatake"]
   s.date = %q{2011-11-24}
-  s.description = %q{A simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
+  s.description = %q{A simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins,Blake Mizerany and Julien Kirch}
   s.email = %q{chiharu.kawatake@gmail.com}
-  s.executables = ["shellforce", "shellforce", "shellforce_config", "shellforce_server"]
+  s.executables = ["shellforce", "shellforce_config", "shellforce_server"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -66,7 +66,7 @@ Gem::Specification.new do |s|
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.6.2}
-  s.summary = %q{Simple wrapper of Salesforce REST API, inspired by Rest Client developed by Adam Wiggins and Julien Kirch}
+  s.summary = %q{Simple wrapper of Salesforce REST API, inspired by Rest Client developed by Adam Wiggins,Blake Mizerany and Julien Kirch}
   s.test_files = ["spec/agent_spec.rb", "spec/agent_spec_helper.rb", "spec/client_spec.rb", "spec/config_spec.rb", "spec/oauth2_spec.rb", "spec/rest_spec.rb", "spec/spec_helper.rb", "spec/transport_spec.rb", "spec/util_spec.rb"]
 
   if s.respond_to? :specification_version then

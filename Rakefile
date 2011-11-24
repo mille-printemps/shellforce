@@ -17,15 +17,12 @@ Jeweler::Tasks.new do |gem|
   gem.name = "shellforce"
   gem.homepage = "http://github.com/mille-printemps/shellforce"
   gem.license = "MIT"
-  gem.summary = %Q{Simple wrapper of Salesforce REST API, inspired by Rest Client developed by Adam Wiggins and Julien Kirch}
-  gem.description = %Q{A simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins and Julien Kirch}
+  gem.summary = %Q{Simple wrapper of Salesforce REST API, inspired by Rest Client developed by Adam Wiggins,Blake Mizerany and Julien Kirch}
+  gem.description = %Q{A simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins,Blake Mizerany and Julien Kirch}
   gem.email = "chiharu.kawatake@gmail.com"
   gem.authors = ["Chiharu Kawatake"]
   gem.files = FileList["[A-Z]*", "{bin,lib,spec}/**/*"]
   gem.test_files = FileList["{spec}/**/*"]
-  gem.executables << 'shellforce'
-  gem.executables << 'shellforce_config'
-  gem.executables << 'shellforce_server'  
   gem.add_runtime_dependency("json", ">= 1.4.6")
   gem.add_development_dependency("rack", ">= 1.3.4")
   gem.add_development_dependency("sinatra", ">= 1.3.1")

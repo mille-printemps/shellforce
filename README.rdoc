@@ -1,6 +1,6 @@
 = shellforce -- simple wrapper of Salesforce.com REST API
 
-A simple wrapper of Salesforce.com REST API, inspired by Rest Client developed by Adam Wiggins and Julien Kirch. 
+A simple wrapper of Salesforce.com REST API, inspired by Rest Client developed by Adam Wiggins,Blake Mizerany and Julien Kirch. (https://github.com/archiloque/rest-client)
 
 * Main page: http://github.com/mille-printemps/shellforce
 
@@ -39,34 +39,46 @@ If the credetials are valid, a command prompt will be shown. (the form of the co
 
 By default, the shell sets the root resource path to <URL of your Salesforce.com organization> + '/services/data' + <the latest API version>, e.g. 'https://na7.salesforce.com/services/data/v23.0'. Specify the rest of the resource path to `get`, `post`, `patch` and `delete`. For SOQL and SOSL queries, just specify a query string after `query` or `search`, respectively. 
 
+  # A response can be returned as XML format
   >> get '/sobjects/account'
+  >> get '/sobjects/account', :xml  
   >> post '/sobjects/account', '{"name" : "foo"}'
-  >> patch '/sobjects/account/001A000000nhLV6IAN', '{"BillingCity" : "Tokyo"}'  # The ID is different in your Salesforce.com organization
+  
+  # The ID is different in your Salesforce.com organization  
+  >> patch '/sobjects/account/001A000000nhLV6IAN', '{"BillingCity" : "Tokyo"}'  
   >> delete '/sobjects/account/001A000000nhLV6IAN'
+  
   >> query 'select name from account'
   >> search 'find {"bar"}'
 
+  # A Ruby style hash can be specified instead of message segments
   >> post '/chatter/feeds/news/me/feed-items', '{"body" : {"messageSegments": [{"type": "Text", "text":"hoge"}]}}'
-  >> post '/chatter/feeds/news/me/feed-items', {"text" => "hoge"}   # A Ruby style hash can be specified instead of message segments like above
+  >> post '/chatter/feeds/news/me/feed-items', {"text" => "hoge"}
+  
   >> post '/chatter/feed-items/0D5A000000YeellKAC/comments', '{"body" : {"messageSegments": [{"type": "Text", "text":"fuga"}]}}'
   >> post '/chatter/feed-items/0D5A000000YeellKAC/comments', {"text" => "fuga"}
-  >> post '/chatter/feed-items/0D5A000000YeellKAB/likes', ''  # The second argument is an empty string
+  
+  # The second argument is an empty string
+  >> post '/chatter/feed-items/0D5A000000YeellKAB/likes', ''  
 
 == Using other resource paths
 
 `to` command will allow you to change the root resource path.
 
+  # The root resource path is set to 'https://na7.salesforce/' if your Salesforce.com organization is hosted at na7.salesforce.com
   >> to :root
-  >> ""  # The root resource path is set to 'https://na7.salesforce/' if your Salesforce.com organization is hosted at na7.salesforce.com
+  >> ""  
   >> get '/services/data'
-  
+
+  # The root resource path is set to 'https://na7.salesforce.com/services/data/v23.0'  
   >> to :data
-  >> "/services/data/v23.0"  # The root resource path is set to 'https://na7.salesforce.com/services/data/v23.0'
+  >> "/services/data/v23.0"
 
 For Apex REST, execute 'to :apex'. 
 
+  # Your own Apex REST serivice has to be implemented beforehand
   >> to :apex
-  >> "/services/apexrest"  # Your own Apex REST serivice has to be implemented beforehand
+  >> "/services/apexrest"
 
   
 == Using multiple configurations
@@ -124,10 +136,10 @@ If you do not want to enter your credential information when you execute `shellf
 
 Some pieces of information are obtained from the command line
 
-  >> instance_url  # The instance URL that your Salesforce.com organization is hosted
+  >> instance_url     # The instance URL that your Salesforce.com organization is hosted
   >> organization_id  # The ID of your Salesforce.com organization
-  >> user_name  # Your user name
-  >> token  # OAuth token
+  >> user_name        # Your user name
+  >> token            # OAuth token
 
 Multi-byte characters can be used in the command line without escaping them (Your terminal application has to support UTF-8.)
 
@@ -136,8 +148,9 @@ Multi-byte characters can be used in the command line without escaping them (You
   
 == Usage: REST Explorer clone
 
-As an applicaiton of shellforce, a clone of REST Explorer, part of Workbench (https://workbench.developerforce.com/login.php) is available. Install some gems first before using it.
+As an applicaiton of shellforce, a clone of REST Explorer, part of Workbench developed by Ryan Brainard (https://workbench.developerforce.com/login.php) is available. Install some gems first before using it.
 
+  %> gem install rack
   %> gem install sinatra
   %> gem install haml
   %> shellforce_server
