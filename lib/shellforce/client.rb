@@ -24,9 +24,7 @@ module ShellForce
   class Client
     def initialize(args={})
       @agent = ShellForce::Agent.new(args)
-
-      @agent.authenticate unless args['access_token']
-      
+      @agent.authenticate unless args[:access_token]
       response = @agent.get("/services/data")
       @current_path = JSON.parse(response.body).collect {|u| u["url"]}.sort[-1]
       @data_path = @current_path.dup

@@ -10,16 +10,17 @@ require 'shellforce/util'
 module ShellForce
   class Agent
     def initialize(args={})
-      @transport = ShellForce::Transport.new
+      args.merge!({:ca_file => ShellForce.config.ca_file, :verify_callback => ShellForce.config.verify_callback}) unless args[:ca_file]
+      @transport = ShellForce::Transport.new(args)
 
-      @id = args['id']
-      @instance_url = args['instance_url']
-      @issued_at = args['issued_at']
-      @signature = args['signature']
-      @refresh_token = args['refresh_token']
-      @organization_id, @token = (args['access_token'] ? args['access_token'].split('!') : [nil, nil])
+      @id = args[:id]
+      @instance_url = args[:instance_url]
+      @issued_at = args[:issued_at]
+      @signature = args[:signature]
+      @refresh_token = args[:refresh_token]
+      @organization_id, @token = (args[:access_token] ? args[:access_token].split('!') : [nil, nil])
       @headers = (@token ? {"Authorization" => "OAuth #{@token}"} : {})
-
+            
       @@pp = {'X-PrettyPrint' => '1'}
 
       if ShellForce.config.logging
@@ -47,10 +48,8 @@ module ShellForce
         @transport.post(ShellForce.config.site + '/services/oauth2/token', query)
       end
 
+      attributes = JSON.parse(response.body)      
       @user_name = user_name
-
-      attributes = JSON.parse(response.body)
-      # TODO : conversion of "issued_at"
       @instance_url = attributes['instance_url']
       @issued_at = attributes['issued_at']
       @signature = attributes['signature']
@@ -74,7 +73,6 @@ module ShellForce
       end
       
       attributes = JSON.parse(response.body)
-      
       @issued_at = attributes['issued_at']
       @signature = attributes['signature']
       @organization_id, @token = attributes['access_token'].split("!")
@@ -103,7 +101,6 @@ module ShellForce
     def post(resource, data, format=ShellForce.config.format)
       request do
         headers = @headers.merge(set_format("Accept", format))
-        
         if data.is_a?(String)
           headers.merge!(set_format("Content-Type", format))
         elsif data.is_a?(Hash)
@@ -111,7 +108,6 @@ module ShellForce
         else
           raise ArgumentError.new("data must be a string or a hash")
         end
-        
         @transport.post(@instance_url + resource, data, ppify(headers))
       end
     end
@@ -165,7 +161,6 @@ module ShellForce
           yield
         end
       end
-      
       raise ShellForce::ResponseCodeError.new(response.code)
     end
 
@@ -187,7 +182,6 @@ module ShellForce
       if (format.to_s != "json") && (format.to_s != "xml") && (format.to_s != "x-www-form-urlencoded")
         raise ArgumentError.new("#{format} format is not accepted.")
       end
-
       {header => "application/#{format}"}
     end
     

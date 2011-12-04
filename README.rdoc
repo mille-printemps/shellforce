@@ -1,4 +1,4 @@
-= shellforce -- simple wrapper of Salesforce.com REST API
+= shellforce -- simple wrapper of salesforce.com REST API
 
 A simple wrapper of Salesforce.com REST API, inspired by Rest Client developed by Adam Wiggins,Blake Mizerany and Julien Kirch. (https://github.com/archiloque/rest-client)
 
@@ -6,19 +6,20 @@ A simple wrapper of Salesforce.com REST API, inspired by Rest Client developed b
 
 == Configuration
 
-Execute `shellforce_config` first. This will ask you to enter information necessary to create a self-signed certificate. The certificate is used for `shellforce_server` mentioned later. 
+Execute `shellforce_config` first. This will ask you to enter information necessary to create a self-signed certificate. The certificate is used for `shellforce_server` explained later. 
 
   %> shellforce_config
   Please enter information for creating a self-signed certificate.
   Country Name (2 letter code) [JP]:
 
-A file named 'local_config.rb' will be created on ENV["HOME"]/.shellforce. Set `client_id` and `client_secret` of your Salesforce.com organization. 
+A file named 'local_config.rb' will be created on ENV["HOME"]/.shellforce. Set `client_id` and `client_secret` of your salesforce.com organization. Setting a path to a CA file is recommended. A CA file can be downloaded at http://curl.haxx.se/ca/cacert.pem .
 
   require 'shellforce/config'
 
   ShellForce.configure :default do
-    set :client_id => ''
-    set :client_secret => ''
+    set :client_id => 'client id of your salesforce.com organization goes here'
+    set :client_secret => 'client secret of your salesforce.com organization goes here'
+    set :ca_file => 'path to a CA file goes here'
     set :pp => true
     set :postprocess => [lambda{|h,b| print b; return h,b}]
     set :logging => false 
@@ -26,30 +27,30 @@ A file named 'local_config.rb' will be created on ENV["HOME"]/.shellforce. Set `
 
 == Shell
 
-Execute `shellforce`. This will ask you to input your credentials of your Salesforce.com organization.
+Execute `shellforce`. This will ask you to input your credentials of your salesforce.com organization.
 
   %> shellforce
   Initializing...
-  Enter your Salesforce.com credentials.
+  Enter your salesforce.com credentials.
   User name: 
 
 If the credetials are valid, a command prompt will be shown. (the form of the command prompt may vary depending on your IRB setting.)
 
 == Examples
 
-By default, the shell sets the root resource path to <URL of your Salesforce.com organization> + '/services/data' + <the latest API version>, e.g. 'https://na7.salesforce.com/services/data/v23.0'. Specify the rest of the resource path to `get`, `post`, `patch` and `delete`. For SOQL and SOSL queries, just specify a query string after `query` or `search`, respectively. 
+By default, the shell sets the root resource path to <URL of your salesforce.com organization> + '/services/data' + <the latest API version>, e.g. 'https://na7.salesforce.com/services/data/v23.0'. Specify the rest of the resource path to `get`, `post`, `patch` and `delete`. For SOQL and SOSL queries, just specify a query string after `query` or `search`, respectively. 
 
   # A response can be returned as XML format
   >> get '/sobjects/account'
   >> get '/sobjects/account', :xml  
-  >> post '/sobjects/account', '{"name" : "foo"}'
+  >> post '/sobjects/account', '{"name" : "hoge"}'
   
-  # The ID is different in your Salesforce.com organization  
+  # The ID is different in your salesforce.com organization  
   >> patch '/sobjects/account/001A000000nhLV6IAN', '{"BillingCity" : "Tokyo"}'  
   >> delete '/sobjects/account/001A000000nhLV6IAN'
   
   >> query 'select name from account'
-  >> search 'find {"bar"}'
+  >> search 'find {"fuga"}'
 
   # A Ruby style hash can be specified instead of message segments
   >> post '/chatter/feeds/news/me/feed-items', '{"body" : {"messageSegments": [{"type": "Text", "text":"hoge"}]}}'
@@ -65,7 +66,7 @@ By default, the shell sets the root resource path to <URL of your Salesforce.com
 
 `to` command will allow you to change the root resource path.
 
-  # The root resource path is set to 'https://na7.salesforce/' if your Salesforce.com organization is hosted at na7.salesforce.com
+  # The root resource path is set to 'https://na7.salesforce.com/' if your salesforce.com organization is hosted at na7.salesforce.com
   >> to :root
   >> ""  
   >> get '/services/data'
@@ -88,8 +89,9 @@ Just add more configurations to your local_config.rb if necessary. Specify the n
   require 'shellforce/config'
 
   ShellForce.configure :default do
-    set :client_id => ''
-    set :client_secret => ''
+    set :client_id => 'client id of your salesforce.com organization goes here'
+    set :client_secret => 'client secret of your salesforce.com organization goes here'
+    set :ca_file => 'path to a CA file goes here'
     set :pp => true
     set :postprocess => [lambda{|h,b| print b; return h,b}]
     set :logging => false 
@@ -97,8 +99,9 @@ Just add more configurations to your local_config.rb if necessary. Specify the n
 
   
   ShellForce.configure :another do
-    set :client_id => 'client id of another Salesforce.com organization goes here'
-    set :client_secret => 'client secret of another Salesforce.com organization goes here'
+    set :client_id => 'client id of another salesforce.com organization goes here'
+    set :client_secret => 'client secret of another salesforce.com organization goes here'
+    set :ca_file => 'path to a CA file'    
     set :pp => false
     set :postprocess => [lambda{|h,b| print b; return h,b}]
     set :logging => true
@@ -106,6 +109,18 @@ Just add more configurations to your local_config.rb if necessary. Specify the n
 
   %> shellforce another
 
+== Scripting
+
+   require 'shellforce'
+
+   # Specify a configuration name if other configuration than the default one is necessary
+   # Set your user name and password in the configuration as explained below so that those things have to be entered manually
+   ShellForce.config.use :another
+
+   client = ShellForce::Client.new
+   ...
+
+  
 == Tweaking the response
 
 A response of a REST API request can be tweaked by implementing plug-ins. A plug-in has to accept two arguments, response header and response body, and have a method named `call` with no arguments. For example, the following plug-in just prints a response body.
@@ -121,10 +136,11 @@ In a configuration, set `logging` to true. A file named `log.txt` will be create
 If you do not want to enter your credential information when you execute `shellforce`, set `user_name` and `password` in your configuration.
 
   ShellForce.configure :default do
-    set :client_id => ''
-    set :client_secret => ''
+    set :client_id => 'client id of your salesforce.com organization goes here'
+    set :client_secret => 'client secret of your salesforce.com organization goes here'
     set :user_name => 'your user name goes here'
     set :password => 'your password goes here'
+    set :ca_file => 'path to a CA file goes here'
     set :pp => true
     set :postprocess => [lambda{|h,b| print b; return h,b}]
     set :logging => false 
@@ -136,17 +152,17 @@ If you do not want to enter your credential information when you execute `shellf
 
 Some pieces of information are obtained from the command line
 
-  >> instance_url     # The instance URL that your Salesforce.com organization is hosted
-  >> organization_id  # The ID of your Salesforce.com organization
+  >> instance_url     # The instance URL that your salesforce.com organization is hosted
+  >> organization_id  # The ID of your salesforce.com organization
   >> user_name        # Your user name
   >> token            # OAuth token
 
 Multi-byte characters can be used in the command line without escaping them (Your terminal application has to support UTF-8.)
 
-  >> query "select name from account where name = '山田 花子'"
+  >> query "select name from account where name = '河竹 千春'"
   >> post '/chatter/feeds/news/me/feed-items', {"text" => "日本語も大丈夫"}  
   
-== Usage: REST Explorer clone
+== REST Explorer clone
 
 As an applicaiton of shellforce, a clone of REST Explorer, part of Workbench developed by Ryan Brainard (https://workbench.developerforce.com/login.php) is available. Install some gems first before using it.
 

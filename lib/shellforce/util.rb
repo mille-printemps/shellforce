@@ -92,6 +92,7 @@ require 'shellforce/config'
 ShellForce.configure :default do
   set :client_id => ''
   set :client_secret => ''
+  set :ca_file => nil
   set :pp => true
   set :postprocess => [lambda{|h,b| print b; return h,b}]
   set :logging => false 
@@ -126,7 +127,6 @@ CONFIG
       cert_body.serial = 1
       cert_body.issuer = issuer
       cert_body.subject = subject
-
       cert_body.sign(key, digest)
 
       File.open(cert, 'w') do |file|
@@ -198,7 +198,7 @@ CONFIG
     
     
     def ask_for_credentials
-      puts "Enter your Salesforce.com credentials."
+      puts "Enter your salesforce.com credentials."
 
       print "User name: "
       user_name = ask

@@ -65,8 +65,6 @@ module ShellForce
         'immediate_unsuccessful' => 'Immediate unsuccessful',
         'invalid_scope' => 'Requested scope is invalid, unknown, or malformed'
       }
-    
   end
-  
 end
 

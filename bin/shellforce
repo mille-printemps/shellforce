@@ -3,6 +3,7 @@
 
 $:.unshift File.dirname(__FILE__) + "/../lib"
 
+require 'shellforce/config'
 require 'shellforce/client'
 
 def client

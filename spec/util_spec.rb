@@ -31,6 +31,7 @@ describe ShellForce::Util do
 
     ShellForce.config.client_id.should == ''
     ShellForce.config.client_secret.should == ''
+    ShellForce.config.ca_file.should == nil
     ShellForce.config.pp.should == true
     ShellForce.config.postprocess[0].call(1,2).should == [1,2]
     ShellForce.config.logging.should == false

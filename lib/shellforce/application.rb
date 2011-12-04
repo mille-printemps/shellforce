@@ -22,7 +22,9 @@ end
 
 # Request handlers
 get ShellForce.config.auth_path + '/callback' do
-  @@client = ShellForce::Client.new(JSON.parse(request.env['shellforce.oauth2']))
+  args = JSON.parse(request.env['shellforce.oauth2'])
+  args.keys.each{|k| args[k.to_sym] = args[k]; args.delete(k)}
+  @@client = ShellForce::Client.new(args)
   redirect ShellForce.config.path
 end
 

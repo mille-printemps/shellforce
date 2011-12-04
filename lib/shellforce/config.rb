@@ -40,7 +40,7 @@ module ShellForce
     
 
     attr_accessor :host, :port, :document_root, :private_key, :cert, \
-    :server_logger, :server_access_logger, \
+    :server_logger, :server_access_logger, :ca_file, :verify_callback, \
     :path, :auth_path, :rack_config, \
     :home, :site, :client_id, :client_secret, \
     :user_name, :password, :user_agent, :format, :pp, :logging, \
@@ -73,6 +73,13 @@ ShellForce.configure :default do
   set :cert => File.join(ShellForce.home, 'cert.pem')
   set :server_logger => WEBrick::Log::new($stderr, WEBrick::Log::FATAL)  
   set :server_access_logger => []
+  set :ca_file => nil
+  set :verify_callback => lambda{|success, context|
+    if (!success) || context.error != 0
+      raise SecurityError.new("SSL verification failed - #{success}, #{context.error} : #{context.error_string}")
+    end
+    true
+  }
   
   # OAuth2 configuration
   set :path => '/shellforce'

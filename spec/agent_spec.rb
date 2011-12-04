@@ -9,8 +9,8 @@ describe ShellForce::Agent do
   include_context "agent_shared_context"
 
   it "can be intialized by arguments" do
-    args = {"signature" => "#{@signature}", "id" => "#{@id}", "instance_url" => "#{@instance_url}",\
-      "access_token" => "#{@organization_id}!#{@token}", "issued_at" => "#{@issued_at}"}
+    args = {:signature => "#{@signature}", :id => "#{@id}", :instance_url => "#{@instance_url}",\
+      :access_token => "#{@organization_id}!#{@token}", :issued_at => "#{@issued_at}"}
     
     agent = ShellForce::Agent.new(args)
 
@@ -37,11 +37,11 @@ describe ShellForce::Agent do
 
   it "refreshes a token" do
     args = {
-      'instance_url' => @instance_url,
-      'issued_at' => @issued_at,
-      'signature' => @signature,
-      'access_token' => "#{@organization_id}!#{@token}",
-      'refresh_token' => @refresh_token
+      :instance_url => @instance_url,
+      :issued_at => @issued_at,
+      :signature => @signature,
+      :access_token => "#{@organization_id}!#{@token}",
+      :refresh_token => @refresh_token
     }
     
     agent = ShellForce::Agent.new(args)

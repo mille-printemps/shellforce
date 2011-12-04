@@ -15,7 +15,6 @@ module ShellForce
       trap(:INT) do
         stop
       end
-      
       super.start
     end
 

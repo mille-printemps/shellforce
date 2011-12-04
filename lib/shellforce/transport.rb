@@ -45,10 +45,15 @@ module ShellForce
         "Accept-Charset" => "ISO-8859-1,utf-8;q=0.7,*;q=0.7"
       }
       @log = args[:log] || nil
+      @ca_file = args[:ca_file] || nil
+      @verify_callback = args[:verify_callback] || nil      
+      @cert = args[:cert] || nil
+      @private_key = args[:private_key] || nil
       @connection_cache = {}
     end
     
-    attr_reader :redirection_code, :follow_redirection, :redirection_limit, :headers
+    attr_reader :redirection_code, :follow_redirection, :redirection_limit, :headers,\
+                :ca_file, :verify_callback, :cert, :private_key
     attr_accessor :user_agent, :keep_alive_time, :log
 
     
@@ -97,11 +102,9 @@ module ShellForce
     def connect(uri)
       connection = (@connection_cache["#{uri.host}:#{uri.port}"] ||= {:object => nil, :last_request_time => nil})
       connection[:object] = net_http(uri) if connection[:object].nil? || !connection[:object].started?
-      
       if connection[:last_request_time] && @keep_alive_time < Time.now.to_i - connection[:last_request_time]
         connection[:object].finish
       end
-
       connection[:last_request_time] = Time.now.to_i
       yield(connection[:object])
     end
@@ -111,7 +114,16 @@ module ShellForce
       Net::HTTP.new(uri.host, uri.port).tap {|h|
         if uri.is_a?(URI::HTTPS)
           h.use_ssl = true
-          h.verify_mode = OpenSSL::SSL::VERIFY_NONE          
+          h.verify_mode = OpenSSL::SSL::VERIFY_NONE
+          if @ca_file
+            h.ca_file = ca_file
+            h.verify_mode = OpenSSL::SSL::VERIFY_PEER
+            h.verify_callback = verify_callback if @verify_callback
+          end
+          if @cert && @private_key
+            h.cert = OpenSSL::X509::Certificate.new(File.read(cert))
+            h.key = OpenSSL::PKey::RSA.new(File.read(private_key))
+          end
         end
       }
     end
@@ -129,7 +141,6 @@ module ShellForce
       url = args[:url] or raise ArgumentError.new("url must be specified")
       data = args[:data] || ''
       headers = args[:headers] || {}
-      
       uri = uri(url, data)
       headers.merge!(@headers)      
 
@@ -157,11 +168,8 @@ module ShellForce
     
     def log_request(method, uri, headers)
       path, query = uri.request_uri.split('?')
-      
       log.info("#{Net::HTTP.const_get(method.to_s.capitalize)}: #{path}")
-      
       log.debug("query: #{query}") if query != nil
-      
       headers.each { |k, v|
         log.debug("request-header: #{k} => #{v}")
       }
@@ -170,7 +178,6 @@ module ShellForce
     
     def log_response(response)
       log.info("status: #{response.code}")
-      
       response.each_header { |k, v|
         log.debug("response-header: #{k} => #{v}")        
       }
@@ -183,4 +190,3 @@ module ShellForce
     
   end
 end
-
