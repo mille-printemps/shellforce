@@ -112,6 +112,13 @@ module ShellForce
       end
     end
 
+
+    def put(resource, data, format=ShellForce.config.format)
+      Rest.request(@current_path + resource, data, format) do |r, d, f|
+        @agent.put(r, d, f)
+      end
+    end
+
     
     def delete(resource, format=ShellForce.config.format)
       Rest.request(@current_path + resource, format) do |r, f|

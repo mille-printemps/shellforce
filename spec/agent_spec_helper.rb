@@ -72,17 +72,38 @@ BODY
   end
 
   
-  def submit_query(resource, &block)
+  def check(method, additional_param, additional_header, additional_resource)
     body = '{"totalSize":0}'
     headers = @headers.merge(@accept)
     headers.merge!(@pp) if ShellForce.config.pp == true
+    headers.merge!(additional_header)
     
-    query = {'q' => 'a'}
+    stub_request(method, @instance_url + @resource + additional_resource).
+      with(additional_param.merge(:headers => headers)).to_return(:body => body)
 
-    stub_request(:get, @instance_url + @resource + resource).
-      with(:query => query, :headers => headers).to_return(:body => body)
-
-    response = block.call(@resource, 'a')
+    response = yield
     response.body.should == body
   end
+
+  
+  def check_with_nothing(method, additional_header={}, additional_resource='')
+    check(method, {}, additional_header, additional_resource) do
+      yield
+    end
+  end
+  
+  
+  def check_with_query(method, payload, additional_header={}, additional_resource='')
+    check(method, {:query => payload}, additional_header, additional_resource) do
+      yield
+    end
+  end
+
+
+  def check_with_string(method, payload, additional_header={}, additional_resource='')
+    check(method, {:body => payload}, additional_header, additional_resource) do
+      yield
+    end
+  end
+  
 end

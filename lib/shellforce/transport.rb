@@ -76,6 +76,11 @@ module ShellForce
       send(:method => :patch, :url => url, :data => data, :headers => headers)
     end
 
+    
+    def put(url, data, headers={})
+      send(:method => :put, :url => url, :data => data, :headers => headers)
+    end
+    
 
     def delete(url, headers={})
       send(:method => :delete, :url => url, :headers => headers)

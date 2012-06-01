@@ -19,7 +19,7 @@ describe ShellForce::Rest do
       end
     end
     
-    method = lambda {|a,b,c| return response}
+    method = lambda {|a,b,c| sleep 1; return response}
     
     result = ShellForce::Rest.request("a", "b", "c") do |a, b, c|
       method.call(a,b,c)

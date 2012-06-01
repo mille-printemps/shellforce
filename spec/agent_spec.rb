@@ -68,73 +68,90 @@ BODY
     agent.headers.should  == @new_headers
   end
 
-  
+
   it "sends a HEAD request" do
     authenticate
 
-    body = '{"totalSize":0}'
-    headers = @headers.merge(@accept)
-    headers.merge!(@pp) if ShellForce.config.pp == true
-
-    stub_request(:head, @instance_url + @resource).
-      with(:headers => headers).to_return(:body => body)
-    
-    response = @agent.head(@resource)
-    response.body.should == body
+    check_with_nothing(:head) do
+      @agent.head(@resource)
+    end
   end
-  
-  
+
+
   it "sends a GET request" do
     authenticate
 
-    body = '{"totalSize":0}'
-    headers = @headers.merge(@accept)
-    headers.merge!(@pp) if ShellForce.config.pp == true
-    
-    stub_request(:get, @instance_url + @resource).
-      with(:headers => headers).to_return(:body => body)
-    
-    response = @agent.get(@resource)
-    response.body.should == body
+    check_with_nothing(:get) do
+      @agent.get(@resource)
+    end
   end
 
   
   it "sends a POST request with a string" do
     authenticate
 
-    body = '{"totalSize":0}'
-    headers = @headers.merge(@accept)
-    headers.merge!(@content_type)
-    headers.merge!(@pp) if ShellForce.config.pp == true
-    
-    request = '{"name" => "name"}'
-    
-    stub_request(:post, @instance_url + @resource).
-      with(:body => request, :headers => headers).to_return(:body => body)
+    payload = '{"q" : "a"}'
 
-    response = @agent.post(@resource, request)
-    response.body.should == body
+    check_with_string(:post, payload, @content_type) do
+      @agent.post(@resource, payload)      
+    end
   end
 
   
   it "sends a POST request with a hash" do
     authenticate
 
-    body = '{"totalSize":0}'
-    headers = @headers.merge(@accept)
-    headers.merge!("Content-Type" => "application/x-www-form-urlencoded")
-    headers.merge!(@pp) if ShellForce.config.pp == true
-    
-    query = {"a" => "b", "c" => "d"}
+    payload = {"q" => "a"}
 
-    stub_request(:post, @instance_url + @resource).
-      with(:query => query, :headers => headers).to_return(:body => body)
-
-    response = @agent.post(@resource, query)
-    response.body.should == body
+    check_with_query(:post, payload, "Content-Type" => "application/x-www-form-urlencoded") do
+      @agent.post(@resource, payload)      
+    end
   end
 
   
+  it "sends a PUT request with a string" do
+    authenticate
+
+    payload = '{"q" : "a"}'
+
+    check_with_string(:put, payload, @content_type) do
+      @agent.put(@resource, payload)      
+    end
+  end
+
+  
+  it "sends a PUT request with a hash" do
+    authenticate
+
+    payload = {"q" => "a"}
+
+    check_with_query(:put, payload, "Content-Type" => "application/x-www-form-urlencoded") do
+      @agent.put(@resource, payload)      
+    end
+  end
+
+  
+  it "sends a PATCH request with a string" do
+    authenticate
+
+    payload = '{"q" : "a"}'
+
+    check_with_string(:patch, payload, @content_type) do
+      @agent.patch(@resource, payload)      
+    end
+  end
+
+  
+  it "sends a PATCH request with a hash" do
+    authenticate
+
+    payload = {"q" => "a"}
+
+    check_with_query(:patch, payload, "Content-Type" => "application/x-www-form-urlencoded") do
+      @agent.patch(@resource, payload)      
+    end
+  end
+
   it "raises an exception when something other than Hash or String" do
     authenticate
     
@@ -143,41 +160,30 @@ BODY
     rescue StandardError => e
       e.class.should == ArgumentError
     end
+
+    begin
+      response = @agent.put(@resource, [["a"],["b"]])
+    rescue StandardError => e
+      e.class.should == ArgumentError
+    end
+
+    begin
+      response = @agent.patch(@resource, [["a"],["b"]])
+    rescue StandardError => e
+      e.class.should == ArgumentError
+    end    
   end
 
   
   it "sends a DELETE request" do
     authenticate
 
-    body = ''
-    headers = @headers.merge(@accept)
-    headers.merge!(@pp) if ShellForce.config.pp == true    
-    
-    stub_request(:delete, @instance_url + @resource).
-      with(:headers => headers).to_return(:body => body)
-
-    response = @agent.delete(@resource)
-    response.body.should == body
+    check_with_nothing(:delete) do
+      @agent.delete(@resource)
+    end
   end
 
   
-  it "sends a PATCH request" do
-    authenticate
-
-    body = '{"totalSize":0}'
-    headers = @headers.merge(@accept)
-    headers.merge!(@content_type)
-    headers.merge!(@pp) if ShellForce.config.pp == true
-    
-    request = '{"name" => "name"}'
-
-    stub_request(:patch, @instance_url + @resource).
-      with(:body => request, :headers => headers).to_return(:body => body)
-
-    response = @agent.patch(@resource, request)
-    response.body.should == body
-  end
-
   it "raises an exception" do
     authenticate
 
@@ -191,6 +197,7 @@ BODY
     end
   end
 
+  
   it "tries to authenticate again and re-sends a request" do
     authenticate
 
@@ -199,13 +206,15 @@ BODY
     response = @agent.get(@wrong_resource)
     response.code.should == "200"
   end
-  
+
   
   it "sends a query for db search" do
     authenticate
 
-    submit_query('/query') do |r, q|
-      @agent.query(r, q)
+    payload = {"q" => "a"}
+    
+    check_with_query(:get, payload, {}, '/query') do
+      @agent.query(@resource, "a")
     end
   end
 
@@ -213,9 +222,11 @@ BODY
   it "sends a query for index search" do
     authenticate
 
-    submit_query('/search') do |r, q|
-      @agent.search(r, q)
+    payload = {"q" => "a"}    
+    
+    check_with_query(:get, payload, {}, '/search') do
+      @agent.search(@resource, "a")
     end
   end
-  
+
 end

@@ -23,6 +23,14 @@ shared_context "transport_shared_context" do
       rlre.redirection_limit.should == 1
     end
   end
+
+  
+  def check(method, additional_param, body)
+    stub_request(method, @url).with(additional_param.merge(:headers => @headers)).to_return(:body => body)
+
+    response = yield
+    response.body.should == body
+  end
 end
 
 
@@ -35,70 +43,89 @@ describe ShellForce::Transport do
     @body = "body"
     @headers = {"Authorization" => "OAuth"}
   end
+
   
   it "sends a HEAD request" do
-    stub_request(:head, @url).with(:headers => @headers).to_return(:body => @body)
-
-    response = @transport.head(@url, @headers)
-    response.body.should == @body
+    check(:head, {}, @body) do
+      @transport.head(@url, @headers)      
+    end
   end
 
-
+  
   it "sends a GET request" do
-    stub_request(:get, @url).with(:headers => @headers).to_return(:body => @body)
-
-    response = @transport.get(@url, '', @headers)
-    response.body.should == @body
+    check(:get, {}, @body) do
+      @transport.get(@url, '', @headers)      
+    end
   end
 
   
   it "sends a GET request with a query" do
     data = {"a" => "b", "c" => "d"}
     
-    stub_request(:get, @url).with(:query => data, :headers => @headers).to_return(:body => @body)
-
-    response = @transport.get(@url, data, @headers)
-    response.body.should == @body
+    check(:get, {:query => data}, @body) do
+      @transport.get(@url, data, @headers)      
+    end
   end
-  
+
   
   it "sends a POST request with a string" do
     data = "data"
 
-    stub_request(:post, @url).with(:body => data, :headers => @headers).to_return(:body => @body)
-
-    response = @transport.post(@url, data, @headers)
-    response.body.should == @body
+    check(:post, {:body => data}, @body) do    
+      @transport.post(@url, data, @headers)
+    end
   end
 
   
   it "sends a POST request with a query" do
     data = {"a" => "b", "c" => "d"}
 
-    stub_request(:post, @url).with(:query => data, :headers => @headers).to_return(:body => @body)
-
-    response = @transport.post(@url, data, @headers)
-    response.body.should == @body
+    check(:post, {:query => data}, @body) do    
+      @transport.post(@url, data, @headers)
+    end
   end
-  
 
-  it "sends a PATCH request" do
+  
+  it "sends a PUT request with a string" do
     data = "data"
 
-    stub_request(:patch, @url).with(:body => data, :headers => @headers).to_return(:body => @body)
+    check(:put, {:body => data}, @body) do    
+      @transport.put(@url, data, @headers)
+    end
+  end
 
-    response = @transport.patch(@url, data, @headers)
-    response.body.should == @body
+  
+  it "sends a PUT request with a query" do
+    data = {"a" => "b", "c" => "d"}
+
+    check(:put, {:query => data}, @body) do    
+      @transport.put(@url, data, @headers)
+    end
+  end
+
+  
+  it "sends a PATCH request with a string" do
+    data = "data"
+
+    check(:patch, {:body => data}, @body) do    
+      @transport.patch(@url, data, @headers)
+    end
+  end
+
+  
+  it "sends a PATCH request with a query" do
+    data = {"a" => "b", "c" => "d"}
+
+    check(:patch, {:query => data}, @body) do    
+      @transport.patch(@url, data, @headers)
+    end
   end
 
   
   it "sends a DELETE request" do
-    body = ''
-
-    stub_request(:delete, @url).with(:headers => @headers).to_return(:body => body)
-
-    response = @transport.delete(@url, @headers)
-    response.body.should == body
+    check(:delete, {}, '') do
+      @transport.delete(@url, @headers)      
+    end
   end
 
   
