@@ -54,7 +54,7 @@ module ShellForce
       @issued_at = attributes['issued_at']
       @signature = attributes['signature']
       @organization_id, @token = attributes['access_token'].split("!")      
-      @headers = {"Authorization" => "OAuth #{@token}"}
+      @headers = {"Authorization" => "Bearer #{@token}"}
 
       @token
     end
@@ -76,7 +76,7 @@ module ShellForce
       @issued_at = attributes['issued_at']
       @signature = attributes['signature']
       @organization_id, @token = attributes['access_token'].split("!")
-      @headers = {"Authorization" => "OAuth #{@token}"}
+      @headers = {"Authorization" => "Bearer #{@token}"}
       
       @token
     end

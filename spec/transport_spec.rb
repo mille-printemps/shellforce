@@ -41,7 +41,7 @@ describe ShellForce::Transport do
     @transport = ShellForce::Transport.new
     @url = "https://login.salesforce.com/"
     @body = "body"
-    @headers = {"Authorization" => "OAuth"}
+    @headers = {"Authorization" => "Bearer"}
   end
 
   

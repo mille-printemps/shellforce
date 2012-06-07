@@ -22,11 +22,11 @@ shared_context "agent_shared_context" do
     @token = 'token'
     @refresh_token = 'refresh_token'
     @id = "https://login.salesforce.com/id/#{@organization_id}/#{@user_id}"
-    @headers = {"Authorization" => "OAuth #{@token}"}
+    @headers = {"Authorization" => "Bearer #{@token}"}
     
     @new_issued_at = '987654321'
     @new_token = 'new_token'
-    @new_headers = {"Authorization" => "OAuth #{@new_token}"}
+    @new_headers = {"Authorization" => "Bearer #{@new_token}"}
 
     @resource = '/resource'
     @wrong_resource = '/wrong_resource'
