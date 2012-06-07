@@ -19,7 +19,7 @@ module ShellForce
       @signature = args[:signature]
       @refresh_token = args[:refresh_token]
       @organization_id, @token = (args[:access_token] ? args[:access_token].split('!') : [nil, nil])
-      @headers = (@token ? {"Authorization" => "OAuth #{@token}"} : {})
+      @headers = (@token ? {"Authorization" => "Bearer #{@token}"} : {})
             
       @@pp = {'X-PrettyPrint' => '1'}
 

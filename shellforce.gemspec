@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chiharu Kawatake"]
-  s.date = %q{2012-06-01}
+  s.date = %q{2012-06-07}
   s.description = %q{A simple wrapper of Salesforce REST API, inspired by the Rest Client developed by Adam Wiggins,Blake Mizerany and Julien Kirch}
   s.email = %q{chiharu.kawatake@gmail.com}
   s.executables = ["shellforce", "shellforce_config", "shellforce_server"]
