@@ -84,48 +84,42 @@ module ShellForce
     
     def head(resource, format=ShellForce.config.format)
       request do
-        headers = get_headers(@headers, format, '')
-        @transport.head(@instance_url + resource, ppify(headers))
+        @transport.head(@instance_url + resource, get_headers(@headers, format, ''))
       end
     end
 
     
     def get(resource, format=ShellForce.config.format)
       request do
-        headers = get_headers(@headers, format, '')        
-        @transport.get(@instance_url + resource, '', ppify(headers))
+        @transport.get(@instance_url + resource, '', get_headers(@headers, format, ''))
       end
     end
 
     
     def post(resource, data, format=ShellForce.config.format)
       request do
-        headers = get_headers(@headers, format, data) 
-        @transport.post(@instance_url + resource, data, ppify(headers))
+        @transport.post(@instance_url + resource, data, get_headers(@headers, format, data))
       end
     end
 
 
     def put(resource, data, format=ShellForce.config.format)
       request do 
-        headers = get_headers(@headers, format, data)
-        @transport.put(@instance_url + resource, data, ppify(headers))
+        @transport.put(@instance_url + resource, data, get_headers(@headers, format, data))
       end
     end
     
     
     def delete(resource, format=ShellForce.config.format)
       request do
-        headers = get_headers(@headers, format, '')        
-        @transport.delete(@instance_url + resource, ppify(headers))
+        @transport.delete(@instance_url + resource, get_headers(@headers, format, ''))
       end
     end
 
     
     def patch(resource, data, format=ShellForce.config.format)
       request do
-        headers = get_headers(@headers, format, data)         
-        @transport.patch(@instance_url + resource, data, ppify(headers))
+        @transport.patch(@instance_url + resource, data, get_headers(@headers, format, data))
       end
     end
 
@@ -165,16 +159,15 @@ module ShellForce
     end
 
     
-    def ppify(headers)
-      ShellForce.config.pp == true ? headers.merge!(@@pp) : headers
+    def submit_query(resource, query, format)
+      request do
+        @transport.get(@instance_url + resource, {'q' => query}, get_headers(@headers, format, ''))
+      end
     end
 
     
-    def submit_query(resource, query, format)
-      request do
-        headers = get_headers(@headers, format, '')
-        @transport.get(@instance_url + resource, {'q' => query}, ppify(headers))
-      end
+    def ppify(headers)
+      ShellForce.config.pp == true ? headers.merge!(@@pp) : headers
     end
     
     
@@ -186,8 +179,9 @@ module ShellForce
     end
 
     
-    def get_headers(header, format, data)
-      headers = @headers.merge(set_format("Accept", format))
+    def get_headers(headers, format, data)
+      headers = ppify(headers)
+      headers.merge!(set_format("Accept", format))
       if data.is_a?(String)
         headers.merge!(set_format("Content-Type", format)) unless data.empty?
       elsif data.is_a?(Hash)
