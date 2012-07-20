@@ -45,7 +45,7 @@ By default, the shell sets the root resource path to <URL of your salesforce.com
   >> get '/sobjects/account', :xml  
   >> post '/sobjects/account', '{"name" : "hoge"}'
   
-  # The ID is different in your salesforce.com organization  
+  # NOTE: the ID is different in your salesforce.com organization  
   >> patch '/sobjects/account/001A000000nhLV6IAN', '{"BillingCity" : "Tokyo"}'  
   >> delete '/sobjects/account/001A000000nhLV6IAN'
   
@@ -58,8 +58,11 @@ By default, the shell sets the root resource path to <URL of your salesforce.com
   
   >> post '/chatter/feed-items/0D5A000000YeellKAC/comments', '{"body" : {"messageSegments": [{"type": "Text", "text":"fuga"}]}}'
   >> post '/chatter/feed-items/0D5A000000YeellKAC/comments', {"text" => "fuga"}
+
+  # A profile photo can also be uploaded
+  >> post '/chatter/users/me/photo', {"fileUpload" => File.new("me.jpg")}
   
-  # The second argument is an empty string
+  # NOTE: the second argument is an empty string
   >> post '/chatter/feed-items/0D5A000000YeellKAB/likes', ''  
 
 == Using other resource paths

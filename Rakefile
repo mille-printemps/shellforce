@@ -24,6 +24,7 @@ Jeweler::Tasks.new do |gem|
   gem.files = FileList["[A-Z]*", "{bin,lib,spec}/**/*"]
   gem.test_files = FileList["{spec}/**/*"]
   gem.add_runtime_dependency("json", ">= 1.4.6")
+  gem.add_runtime_dependency("mime-types", ">=1.16")
   gem.add_development_dependency("rack", ">= 1.3.4")
   gem.add_development_dependency("sinatra", ">= 1.3.1")
   gem.add_development_dependency("haml", ">= 3.1.3")    

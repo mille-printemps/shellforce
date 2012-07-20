@@ -4,11 +4,12 @@ require 'rubygems'
 require 'json'
 require 'shellforce/transport'
 require 'shellforce/config'
-require 'shellforce/exception'
-require 'shellforce/util'
+require 'shellforce/payload'
 
 module ShellForce
   class Agent
+    PP = {'X-PrettyPrint' => '1'}
+    
     def initialize(args={})
       args.merge!({:ca_file => ShellForce.config.ca_file, :verify_callback => ShellForce.config.verify_callback}) unless args[:ca_file]
       @transport = ShellForce::Transport.new(args)
@@ -21,8 +22,6 @@ module ShellForce
       @organization_id, @token = (args[:access_token] ? args[:access_token].split('!') : [nil, nil])
       @headers = (@token ? {"Authorization" => "Bearer #{@token}"} : {})
             
-      @@pp = {'X-PrettyPrint' => '1'}
-
       if ShellForce.config.logging
         require 'logger'
         @transport.log = Logger.new(File.join(ShellForce.home, 'log.txt'))
@@ -84,42 +83,48 @@ module ShellForce
     
     def head(resource, format=ShellForce.config.format)
       request do
-        @transport.head(@instance_url + resource, get_headers(@headers, format, ''))
+        payload = Payload.new('', @headers, format)
+        @transport.head(@instance_url + resource, ppify(payload.headers))
       end
     end
 
     
-    def get(resource, format=ShellForce.config.format)
+    def get(resource, format=ShellForce.config.format)      
       request do
-        @transport.get(@instance_url + resource, '', get_headers(@headers, format, ''))
+        payload = Payload.new('', @headers, format)        
+        @transport.get(@instance_url + resource, payload.data, ppify(payload.headers))
       end
     end
 
     
     def post(resource, data, format=ShellForce.config.format)
       request do
-        @transport.post(@instance_url + resource, data, get_headers(@headers, format, data))
+        payload = Payload.new(data, @headers, format)        
+        @transport.post(@instance_url + resource, payload.data, ppify(payload.headers))
       end
     end
 
 
     def put(resource, data, format=ShellForce.config.format)
-      request do 
-        @transport.put(@instance_url + resource, data, get_headers(@headers, format, data))
+      request do
+        payload = Payload.new(data, @headers, format)
+        @transport.put(@instance_url + resource, payload.data, ppify(payload.headers))
       end
     end
     
     
     def delete(resource, format=ShellForce.config.format)
       request do
-        @transport.delete(@instance_url + resource, get_headers(@headers, format, ''))
+        payload = Payload.new('', @headers, format)   
+        @transport.delete(@instance_url + resource, ppify(payload.headers))
       end
     end
 
     
     def patch(resource, data, format=ShellForce.config.format)
       request do
-        @transport.patch(@instance_url + resource, data, get_headers(@headers, format, data))
+        payload = Payload.new(data, @headers, format)        
+        @transport.patch(@instance_url + resource, payload.data, ppify(payload.headers))
       end
     end
 
@@ -161,35 +166,14 @@ module ShellForce
     
     def submit_query(resource, query, format)
       request do
-        @transport.get(@instance_url + resource, {'q' => query}, get_headers(@headers, format, ''))
+        payload = Payload.new({'q' => query}, @headers, format)
+        @transport.get(@instance_url + resource, payload.data, ppify(payload.headers))
       end
     end
 
-    
+
     def ppify(headers)
-      ShellForce.config.pp == true ? headers.merge!(@@pp) : headers
-    end
-    
-    
-    def set_format(header, format)
-      if (format.to_s != "json") && (format.to_s != "xml") && (format.to_s != "x-www-form-urlencoded")
-        raise ArgumentError.new("#{format} format is not accepted.")
-      end
-      {header => "application/#{format}"}
-    end
-
-    
-    def get_headers(headers, format, data)
-      headers = ppify(headers)
-      headers.merge!(set_format("Accept", format))
-      if data.is_a?(String)
-        headers.merge!(set_format("Content-Type", format)) unless data.empty?
-      elsif data.is_a?(Hash)
-        headers.merge!(set_format("Content-Type", "x-www-form-urlencoded"))
-      else
-        raise ArgumentError.new("data must be a string or a hash")
-      end
-      headers
+      ShellForce.config.pp == true ? headers.merge!(PP) : headers
     end
     
   end

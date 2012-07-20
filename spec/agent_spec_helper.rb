@@ -77,6 +77,8 @@ BODY
     headers = @headers.merge(@accept)
     headers.merge!(@pp) if ShellForce.config.pp == true
     headers.merge!(additional_header)
+    transport = ShellForce::Transport.new
+    headers.merge!(transport.headers)
     
     stub_request(method, @instance_url + @resource + additional_resource).
       with(additional_param.merge(:headers => headers)).to_return(:body => body)

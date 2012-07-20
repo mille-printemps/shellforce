@@ -213,7 +213,7 @@ BODY
 
     payload = {"q" => "a"}
     
-    check_with_query(:get, payload, {}, '/query') do
+    check_with_query(:get, payload, {"Content-Type" => "application/x-www-form-urlencoded"}, '/query') do
       @agent.query(@resource, "a")
     end
   end
@@ -224,7 +224,7 @@ BODY
 
     payload = {"q" => "a"}    
     
-    check_with_query(:get, payload, {}, '/search') do
+    check_with_query(:get, payload, {"Content-Type" => "application/x-www-form-urlencoded"}, '/search') do
       @agent.search(@resource, "a")
     end
   end
