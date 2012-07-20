@@ -61,6 +61,9 @@ By default, the shell sets the root resource path to <URL of your salesforce.com
 
   # A profile photo can also be uploaded
   >> post '/chatter/users/me/photo', {"fileUpload" => File.new("me.jpg")}
+
+  # An attachment can be added to a feed and comment
+   post '/chatter/feeds/news/me/feed-items', {"json" => '{"body" : {"messageSegments" : [{"type":"text", "text":"a photo"}]}, "attachment":{"filename":"photo"}}', "feedItemFileUpload" => File.new("photo.jpg")}
   
   # NOTE: the second argument is an empty string
   >> post '/chatter/feed-items/0D5A000000YeellKAB/likes', ''  
